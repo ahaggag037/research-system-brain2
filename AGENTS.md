@@ -1,32 +1,32 @@
-# FixHUA — AI / Engineer Entry
+# FixHUA FH-A2 — AI / Engineer Entry
 
-Read **`docs/project/00_START_HERE.md` first**. Current machine state is `PROJECT_STATE.json`. Final continuation state is `HANDOFF_CHECKPOINT.md`; future-session rules are `docs/project/FUTURE_MODEL_PROTOCOL.md`.
+Read **`docs/project/00_START_HERE.md` first**, then `PROJECT_STATE.json`. Active architecture is FH-A2. FH-A1/V10.3-B completion is historical and must not override Arm B research.
+
+## Epistemic hierarchy
+**Internal knowledge proposes. External evidence challenges and expands. Real-device evidence decides device-specific truth.**
+
+Platform/AOSP/Huawei/Linux documentation establishes a mechanism/reference behavior, never target capability. Every target claim must carry device/build/access evidence or remain UNKNOWN/UNOBSERVABLE.
 
 ## Canonical truth locations
-- Current phase / implementation / blockers: `PROJECT_STATE.json`
-- Architecture and rationale: `docs/architecture/ARCHITECTURE.md`, then `docs/architecture/DECISIONS.md`
-- Component ownership/contracts: `docs/architecture/COMPONENT_CONTRACTS.md`
-- Interfaces/runtime/state/recovery: `docs/architecture/INTERFACES_AND_RUNTIME.md`, `DATA_STATE_MODEL.md`, `FAILURE_RECOVERY_MATRIX.md`
-- Build and next implementation work: `docs/implementation/BUILD_RUNBOOK.md`, `FIRST_BUILD_CRITICAL_PATH.md`, `IMPLEMENTATION_BLUEPRINT.md`
-- Validation: `docs/implementation/TEST_MATRIX.md`, `docs/evidence/EVIDENCE_AND_EXPERIMENTS.md`
-- Visual twin: `docs/visual/*.mmd` and `VISUAL_TRACEABILITY.json`
-- Programmatic navigation: `KNOWLEDGE_GRAPH.json`, `IMPLEMENTATION_MAP.json`
-- Final audit / handoff: `FINAL_AUDIT.md`, `HANDOFF_CHECKPOINT.md`, `REQUIREMENT_TRACEABILITY.md`
+- current phase/build/blockers: `PROJECT_STATE.json`
+- mandatory Arm B evidence: `docs/evidence/EXTERNAL_RESEARCH_EXPANSION_ARM_B.md`, `docs/evidence/SOURCES.md`
+- architecture reevaluation/delta: `docs/architecture/ARCHITECTURE_REEVALUATION_ARM_B.md`, `docs/project/ARM_B_CHANGELOG.md`
+- selected design: `docs/architecture/ARCHITECTURE.md`, `DECISIONS.md`, `COMPONENT_CONTRACTS.md`
+- runtime/data/recovery/safety: `INTERFACES_AND_RUNTIME.md`, `DATA_STATE_MODEL.md`, `FAILURE_RECOVERY_MATRIX.md`, `PRIVILEGE_AND_SAFETY.md`
+- implementation: `docs/implementation/`
+- navigation: `KNOWLEDGE_GRAPH.json`, `IMPLEMENTATION_MAP.json`, `VISUAL_TRACEABILITY.json`
 
-## Truth-state rule
-Use only: `VERIFIED_FACT`, `IMPLEMENTED`, `TESTED`, `PROPOSED`, `EXPERIMENTAL`, `HYPOTHESIS`, `REJECTED`, `DEFERRED`, `UNKNOWN`. Never silently promote a state. "Implemented" does not mean "tested on target."
+## Incident evidence rule
+For an incident, prefer reliable direct, version-qualified platform evidence over generic pressure inference. If direct evidence is unavailable/denied/ambiguous, request the minimum next evidence tier. `UNKNOWN` is correct when evidence remains insufficient.
 
-## Conflict rule
-For **what runs now**: verified target-device evidence > checked-out code > current tests/CI > current build artifacts > project-state/docs. For **why it is designed this way**: active decision records > architecture > component contracts > implementation blueprint. If artifacts disagree, record the contradiction and repair it; do not guess.
+## Privilege rule
+No raw root command surface. A write actuator needs exact target control semantics, bounds, expected user outcome, preconditions/exclusions, baseline, timeout/abort, read-back, failure-tested rollback and same-device/firmware canary evidence. No thermal/hardware/integrity/DRM/account/banking/security bypasses.
 
-## Privileged-change rule
-Root/shell access is a capability, not permission to tune. A write actuator is production-admissible only after device-specific evidence establishes observed control semantics, bounded scope, expected effect, preconditions, abort, verification, timeout, rollback, and a canary test. Never add an arbitrary root-command API, disable thermal/hardware safety, or bypass account/banking/DRM/integrity protections.
-
-## Missing device facts
-Do **not** invent kernel nodes, cgroup paths, LMKD properties, Huawei settings paths, actuator values, or feature availability. Mark `UNKNOWN` and run the smallest capability/discovery test.
-
-## Same-change documentation rule
-Any code change that materially changes architecture, interface, behavior, privilege, safety, state schema, build procedure, or project phase must update affected canonical docs **and** machine-readable state in the same change. Documentation drift is a defect.
+## Observer rule
+Measurement can become the problem. Deep traces are bounded, capture cost is recorded, and no correctness assumption depends on an ordinary app polling continuously while cached/backgrounded.
 
 ## Recovery after interruption
-Read, in order: `.v10/working_memory/CHECKPOINT.md`, `.v10/working_memory/REQUIREMENT_LEDGER.md`, `.v10/working_memory/DECISION_LOG.md`, then canonical artifacts above. Reconcile scratch claims against actual repository code/tests before acting.
+Read `.v10/working_memory/CHECKPOINT.md` → `REQUIREMENT_LEDGER.md` → `DECISION_LOG.md` → `SOURCE_INDEX.md`, then reconcile with `PROJECT_STATE.json` and actual code/tests. Scratch state is noncanonical and cannot override verified artifacts.
+
+## Same-change rule
+Architecture/interface/privilege/state/build changes update ADR + PROJECT_STATE + affected machine maps/visuals/tests in the same logical change. Documentation drift is a defect.

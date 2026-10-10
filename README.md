@@ -1,11 +1,7 @@
-# FixHUA Supervisor
+# FixHUA Supervisor — FH-A2
 
-FixHUA is a clean-room, evidence-gated Android/Huawei performance-and-continuity project. It is designed to **diagnose first, act only when evidence earns the action**, and avoid fighting Android/Huawei resource, power, thermal, and lifecycle controllers.
+Current architecture: **FH-A2 — Incident-Centric Evidence Escalation Supervisor**, selected after the mandatory Arm B external-research expansion.
 
-**Start here:** [`AGENTS.md`](AGENTS.md) → [`docs/project/00_START_HERE.md`](docs/project/00_START_HERE.md)
+Start at [`docs/project/00_START_HERE.md`](docs/project/00_START_HERE.md). Machine state: [`PROJECT_STATE.json`](PROJECT_STATE.json). Research delta from prior completed FH-A1: [`docs/project/ARM_B_CHANGELOG.md`](docs/project/ARM_B_CHANGELOG.md).
 
-Current status is machine-readable in [`PROJECT_STATE.json`](PROJECT_STATE.json). The repository includes a tested host-side reference analyzer and a read-only Android-shell probe; the Android APK and any privileged write actuator are **not yet implemented or target-device validated**.
-
-No predecessor FixHUA repository or hidden conversation context is required to continue this project.
-
-Final mission audit: [`FINAL_AUDIT.md`](FINAL_AUDIT.md). Handoff: [`HANDOFF_CHECKPOINT.md`](HANDOFF_CHECKPOINT.md).
+Current implementation is **M0.2 read-only probe + host analyzer/validators**. There is no Android APK and no privileged write actuator. Exact target behavior remains M1 device evidence.

@@ -1,31 +1,36 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "project": "FixHUA Supervisor",
   "repository": "ahaggag037/research-system-brain2",
   "canonicalBranch": "main",
-  "phase": "STATE_D_FINAL_AUDIT_COMPLETE",
-  "architecture": {"id":"FH-A1","name":"Evidence-Gated Adaptive Supervisor","status":"PROPOSED","specification":"FULLY_SPECIFIED"},
-  "completeness": {"knowledgePackage":"FULLY_SPECIFIED_AND_AUDITED","software":"PARTIALLY_IMPLEMENTED","targetValidation":"BLOCKED_BY_DEVICE_EVIDENCE"},
+  "phase": "ARM_B_RECONVERGED_AUDIT_PENDING",
+  "historicalCompletion": {"version":"V10.3-B","architecture":"FH-A1","finalCommit":"0b114e4f224ebac957cf8245acd1002fa43081fa","status":"HISTORICAL_SUPERSEDED_BY_ARM_B_RESEARCH_EXPANSION"},
+  "architecture": {"id":"FH-A2","name":"Incident-Centric Evidence Escalation Supervisor","status":"SELECTED","specification":"FULLY_SPECIFIED_AUDIT_PENDING","supersedes":"FH-A1"},
+  "completeness": {"researchExpansion":"COMPLETE","knowledgePackage":"RECONVERGED_AUDIT_PENDING","software":"PARTIALLY_IMPLEMENTED","targetValidation":"BLOCKED_BY_DEVICE_EVIDENCE"},
   "implementedSubsystems": [
-    {"id":"SRC-001","name":"Read-only shell device probe","status":"IMPLEMENTED","tested":"NOT_TARGET_TESTED"},
-    {"id":"SRC-002","name":"Host evidence analyzer","status":"IMPLEMENTED","tested":"TESTED_HOST_ENVIRONMENT_6_UNIT_TESTS"},
+    {"id":"SRC-001","name":"M0.2 read-only target capability/pressure probe","status":"IMPLEMENTED","tested":"HOST_NON_ANDROID_FALLBACK_AND_STATIC_NO_WRITE_ONLY; NOT_TARGET_TESTED"},
+    {"id":"SRC-002","name":"M0.2 conservative host analyzer","status":"IMPLEMENTED","tested":"TESTED_HOST_ENVIRONMENT_8_SUITE_TOTAL"},
     {"id":"SRC-003","name":"Repository/final-audit validators","status":"IMPLEMENTED","tested":"TESTED_HOST_ENVIRONMENT"}
   ],
-  "unimplementedSubsystems":["CMP-001","CMP-002_ANDROID","CMP-003","CMP-004_ANDROID","CMP-005","CMP-006","CMP-007","CMP-008","CMP-009","CMP-010"],
-  "verifiedFacts":[
-    {"id":"VF-001","claim":"Public Android/Linux sources document interacting LMKD/reclaim/PSI/cgroup/freezer/thermal mechanisms; these do not prove target capability.","source":"docs/evidence/SOURCES.md"},
-    {"id":"VF-002","claim":"Huawei documents background/app-launch/battery settings as distinct causes of background-app continuity problems.","source":"docs/evidence/SOURCES.md"},
-    {"id":"VF-003","claim":"The canonical GitHub repository is ahaggag037/research-system-brain2 on main and began empty for this clean-room mission.","source":"mission/GitHub verification"}
+  "unimplementedSubsystems":["A2-001","A2-002","A2-003","A2-004","A2-005","A2-006","A2-007","A2-008","A2-009"],
+  "platformVerifiedFacts":[
+    {"id":"VF2-001","claim":"Android 17 reference platform includes a cgroup-v2 MemoryLimiter distinct from classic LMKD/global pressure.","source":"S-017/S-018/S-019","targetApplicability":"UNKNOWN"},
+    {"id":"VF2-002","claim":"Android 17 QPR2/API 37.2 provides app memory budgets/MemoryBudgetManager.","source":"S-021","targetApplicability":"UNKNOWN"},
+    {"id":"VF2-003","claim":"Android exposes historical exit records and API 35+ start records with version/permission limitations.","source":"S-019/S-020","targetApplicability":"UNKNOWN"},
+    {"id":"VF2-004","claim":"Cached-app/freezer and background-policy mechanisms can affect continuity independently of global memory pressure.","source":"S-022..S-025","targetApplicability":"UNKNOWN"},
+    {"id":"VF2-005","claim":"Perfetto supports trigger-based bounded capture with Android privilege constraints.","source":"S-026","targetApplicability":"UNKNOWN"},
+    {"id":"VF2-006","claim":"MGLRU/cgroup/DAMON mechanisms exist in Linux/AOSP reference stacks; existence does not prove safe target actuation.","source":"S-027..S-030","targetApplicability":"UNKNOWN"},
+    {"id":"VF2-007","claim":"Huawei documents multiple background-continuity policy controls whose paths vary by EMUI/HarmonyOS family.","source":"S-031..S-033","targetApplicability":"UNKNOWN"}
   ],
-  "criticalUnknowns":["Exact target model/OS/kernel/build and observable pressure/thermal/process capabilities","Whether explicit shell/root read access is needed and which broker is available","Which if any privileged write actuator has measurable benefit and safe rollback on the exact target","Android build toolchain versions until M2 bootstrap"],
-  "activeRisks":["RISK-001 unsafe privileged actuation","RISK-002 noncausal tweak superstition","RISK-003 telemetry self-interference","RISK-004 controller conflict","RISK-005 vendor-policy misclassification","RISK-006 telemetry privacy"],
-  "buildState":{"m0HostUtility":"SOURCE_PRESENT_AND_HOST_TESTED","androidApk":"NOT_IMPLEMENTED","androidToolchain":"UNKNOWN"},
-  "testState":{"hostUnit":"TESTED_6_OF_6_PASS_IN_MISSION_CONTAINER","repoValidation":"TESTED_PASS_IN_MISSION_CONTAINER","targetDevice":"NOT_RUN_NO_DEVICE","privilegedActuator":"NOT_APPLICABLE_NONE_ADMITTED","m0ProbeSmoke":"TESTED_NON_ANDROID_FALLBACK_ONLY","coldStart":"PASS_GITHUB_CONNECTOR_FRESH_READ; direct git clone unavailable due container DNS"},
-  "currentBlockers":[{"id":"B-001","scope":"target validation / M1","reason":"No actual Huawei target device was connected in this mission session.","recovery":"Run M1 E-001/E-002 using BUILD_RUNBOOK on target; keep raw snapshot private."}],
-  "nextRecommendedMilestone":{"id":"M1","name":"DEVICE_EVIDENCE_BOOTSTRAP","exactTask":"Run read-only tools/device_probe.sh on the actual Huawei device, analyze the private snapshot, measure observer feasibility/overhead, then update DeviceProfile assumptions and M2 sensor set without adding writes."},
-  "truthStateLegend":["VERIFIED_FACT","IMPLEMENTED","TESTED","PROPOSED","EXPERIMENTAL","HYPOTHESIS","REJECTED","DEFERRED","UNKNOWN"],
-  "auditState":{"requirementsLoaded":90,"requirementsSatisfied":90,"blockedMissionMust":0,"codeDefectsRepaired":["F-001 portable TSV parsing in M0 probe"],"truthStateAudit":"PASS","visualAudit":"PASS","contradictionAudit":"PASS_AFTER_REPAIRS","complexityAudit":"PASS","innovationAudit":"PASS_NO_NOVELTY_INFLATION","safetyAudit":"PASS_NONE_WRITE_ADMITTED","buildSpeedAudit":"PASS","workingMemoryDistillation":"PASS","secretScan":"PASS"},
-  "package":{"version":"V10.3-Clean-Repo-Knowledge-Package","artifact":"FixHUA-Blind-Genesis-V10.3-Clean-Repo-Knowledge-Package.zip","status":"CREATED_AND_VALIDATED_IN_MISSION_CONTAINER","manifest":"PACKAGE_MANIFEST.json","checksums":"SHA256SUMS.txt"},
-  "repositoryStatusProof":{"repository":"ahaggag037/research-system-brain2","branch":"main","prePackageHead":"1f2f012c7493ddf5a450e01044dc56e0ed390161","note":"Final current HEAD is reported after final metadata publication to avoid self-reference."},
-  "lastUpdatedBy":"V10.3-B STATE_D final audit and transfer packaging 2026-10-10"
+  "criticalUnknowns":["Exact Huawei model, Android API/full-SDK, EMUI/HarmonyOS lineage, kernel/vendor build","MemoryLimiter/app-memory-budget/freezer/MGLRU/DAMON/Perfetto presence and access on target","Self vs cross-UID ApplicationExitInfo/ApplicationStartInfo access by available privilege tier","Thermal headroom/status quality and observer overhead on target","Exact Huawei policy behavior on target build","Whether any privileged write actuator has repeatable user benefit, clear ownership and safe rollback","Android build toolchain versions until M2 bootstrap"],
+  "activeRisks":["RISK-001 unsafe privileged actuation","RISK-002 noncausal attribution","RISK-003 observer self-interference","RISK-004 controller conflict","RISK-005 platform/vendor-version misclassification","RISK-006 telemetry privacy"],
+  "buildState":{"m0HostUtility":"M0.2_SOURCE_PRESENT_AND_HOST_TESTED","androidApk":"NOT_IMPLEMENTED","androidToolchain":"UNKNOWN"},
+  "testState":{"hostUnit":"TESTED_8_OF_8_PASS_IN_MISSION_CONTAINER","repoValidation":"PASS_PRE_AUDIT","targetDevice":"NOT_RUN_NO_DEVICE","privilegedActuator":"NOT_APPLICABLE_NONE_ADMITTED","m0ProbeSmoke":"PASS_NON_ANDROID_FALLBACK; TARGET_COMMANDS_NOT_TESTED","coldStart":"PENDING_REVISED_GITHUB_STATE"},
+  "currentBlockers":[{"id":"B-001","scope":"M1 target truth / Android target validation","reason":"No actual Huawei target is connected in this mission session.","recovery":"Run M1 E-001/E-002/E-003/E-005 read-only/measurement bootstrap on the exact target; no writes."}],
+  "nextRecommendedMilestone":{"id":"M1","name":"INCIDENT_AND_CAPABILITY_BOOTSTRAP","exactTask":"Run M0.2 on the target, establish versioned capability/access matrix for direct exit/start history, MemoryLimiter/budgets/freezer/cgroup/PSI/MGLRU/DAMON/Perfetto/Huawei policy/thermal, reproduce at least one incident, and measure observer cost without system writes."},
+  "truthStateLegend":["VERIFIED_FACT","IMPLEMENTED","TESTED","SELECTED","PROPOSED","EXPERIMENTAL","HYPOTHESIS","REJECTED","SUPERSEDED","DEFERRED","UNKNOWN","UNOBSERVABLE","UNSUPPORTED"],
+  "researchExpansion":{"arm":"B","status":"COMPLETE_RECONVERGED","questionPaths":12,"sourceRange":"S-017..S-044","researchDoc":"docs/evidence/EXTERNAL_RESEARCH_EXPANSION_ARM_B.md","architectureDelta":"docs/project/ARM_B_CHANGELOG.md","stoppingRule":"Remaining consequential uncertainty requires target-device evidence."},
+  "auditState":{"requirementsLoaded":106,"requirementsSatisfied":"PENDING_FINAL_AUDIT","blockedMissionMust":"PENDING_FINAL_AUDIT","truthStateAudit":"PENDING","visualAudit":"PENDING","contradictionAudit":"PENDING","complexityAudit":"PENDING","researchAudit":"PENDING","safetyAudit":"PENDING","secretScan":"PENDING"},
+  "package":{"version":"V10.3B-Arm-B-Research-Expanded-Knowledge-Package","artifact":"PENDING","status":"PENDING_FINAL_AUDIT"},
+  "lastUpdatedBy":"V10.3-B Arm B reconvergence — final audit pending 2026-10-10"
 }
