@@ -1,25 +1,12 @@
-# Future-Model Continuation Protocol
+# Future Model Protocol — FH-A2 continuation
 
-This repository is designed to continue without the originating conversation.
-
-## First reads
-1. `AGENTS.md`
-2. `PROJECT_STATE.json`
-3. `docs/project/00_START_HERE.md`
-4. `HANDOFF_CHECKPOINT.md`
-5. `docs/implementation/FIRST_BUILD_CRITICAL_PATH.md`
-
-## Continuation rule
-Treat GitHub `main` as canonical. Reconcile claims against actual code/tests before changing state. Do not rely on predecessor repositories or hidden chat context. `.v10/working_memory/` is operational history, not higher authority than canonical docs/code/tests.
-
-## Exact next milestone
-`M1 — DEVICE_EVIDENCE_BOOTSTRAP`: on the actual Huawei target, run the read-only `tools/device_probe.sh`, keep raw output private, analyze it with `tools/analyze_snapshot.py`, and execute E-001/E-002. Use the result to choose only observables proven available for M2. Do **not** add privileged writes during M1.
-
-## When facts are missing
-Mark them `UNKNOWN`; run the smallest reversible read-only probe. Never invent kernel paths, vendor settings, root brokers, thresholds, actuator values, or target support.
-
-## Privilege rule
-No write actuator is currently qualified. A future write must pass `docs/architecture/PRIVILEGE_AND_SAFETY.md` and E-005 on the exact device/firmware. No arbitrary root command surface.
-
-## Same-change obligation
-If implementation changes architecture, interfaces, state, privilege, build procedure, readiness, or risk, update affected canonical docs and `PROJECT_STATE.json` in the same change.
+1. Read `AGENTS.md` → `PROJECT_STATE.json` → `docs/project/00_START_HERE.md` → `HANDOFF_CHECKPOINT.md`.
+2. Treat V10.3-B/FH-A1 completion as historical, not current architecture truth.
+3. Read Arm B external research before reopening architecture: `EXTERNAL_RESEARCH_EXPANSION_ARM_B.md`, `ARCHITECTURE_REEVALUATION_ARM_B.md`, active ADRs.
+4. Preserve epistemic hierarchy: **internal knowledge proposes; external evidence challenges/expands; real-device evidence decides device-specific truth.**
+5. Never infer target support from AOSP/Huawei docs. Read/measure exact build.
+6. For M1 do not add system writes. Collect only read evidence into user-writable/private storage.
+7. If direct platform incident evidence is unavailable, record `UNOBSERVABLE` and use the minimum next capture tier; do not create fake certainty from PSI/free RAM.
+8. Before any architecture-changing edit, update ADR + PROJECT_STATE + affected machine maps/visuals in the same change.
+9. Before any privileged write, satisfy A2-006 admission/rollback contract and same-device experiment evidence.
+10. Re-run tests/validators/cold-start after consequential changes.

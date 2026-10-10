@@ -1,35 +1,35 @@
-# Problem, Outcomes, Success Model
+# Problem and Success — FH-A2
 
-## Problem definition
-Huawei-class Android phones can exhibit app reloads/exits, slow resume, jank, stalls and unstable sustained performance for **different underlying reasons that look similar to a user**. Plausible mechanisms include global memory pressure/reclaim/LMKD, OEM background/battery policy, thermal throttling, CPU or I/O contention, app crash/ANR, storage pressure, or an update/user action. Applying a generic "optimization" to the wrong mechanism can do nothing or make the phone worse.
+## Product problem
+A Huawei/Android user can experience reloads, exits, slow resumes, jank or background discontinuity for mechanically different reasons: LMKD/global pressure, Android 17 MemoryLimiter, cached freezer/Binder behavior, background-policy quotas, Huawei launch/battery policy, crash/ANR, CPU/I/O contention, thermal throttling, or the app's own memory footprint. Treating all symptoms as “not enough RAM” or “Huawei killed it” produces unsafe and often useless tweaks.
 
-## User-visible goals
-FixHUA optimizes the following outcome vector rather than one scalar:
-- foreground interaction latency and jank;
-- useful app continuity and warm resume quality;
-- fewer avoidable process reloads/exits;
-- stable sustained behavior under realistic thermal/battery constraints;
-- predictable explanations and reversible changes;
-- low observer/controller overhead.
+FixHUA must turn a symptom into a provenance-bearing incident explanation and only escalate measurement/control when the evidence warrants it.
 
-## Success model
-A policy earns adoption only if it improves a relevant user-visible metric under representative workloads **without unacceptable regression** in stability, battery/thermal behavior, privacy, background correctness or another protected workload. A no-op that correctly avoids an unjustified tweak is success.
+## Success hierarchy
+### Diagnostic success
+- incident attributed to a supported direct cause or honestly `UNKNOWN_OR_MIXED`;
+- evidence source/version/access and contradictions visible;
+- no hidden assumption that continuous telemetry was available.
+
+### User-outcome success
+On repeated target workflows, reduce one or more of:
+- avoidable cold relaunches/reloads;
+- relaunch latency / TTID / TTFD where measurable;
+- recurrence of policy-limited background failures;
+- jank/thermal instability associated with tested intervention;
+while not worsening crashes, battery/thermal behavior, important background semantics or data integrity.
+
+### Safety/reliability success
+- observer cost within measured target budget;
+- no unqualified privileged writes;
+- rollback verified before promotion;
+- firmware changes invalidate device-specific qualifications;
+- private evidence does not leak into public repo/package.
 
 ## Non-goals
-- maximizing free RAM;
-- pinning every app in memory;
-- forcing maximum clocks;
-- disabling thermal or battery safety;
-- chasing synthetic benchmarks as the primary objective;
-- providing an unrestricted root shell to the UI;
-- bypassing app integrity, DRM, accounts, banking protections or platform security;
-- fabricating universal kernel/sysfs/cgroup settings.
-
-## Measurement families
-1. **Responsiveness:** frame/jank statistics, interaction-to-visible-response timing where measurable.
-2. **Continuity:** warm-vs-cold resume, process survival reason when observable, reload frequency for explicitly tested apps.
-3. **Pressure/health:** CPU/memory/I/O PSI when available, reclaim/swap/zRAM indicators, thermal state, load and I/O latency clues.
-4. **Correctness:** app crash/ANR, notification/background behavior, intervention rollback correctness.
-5. **Overhead:** FixHUA CPU, wakeups, memory, storage writes, battery/thermal effect.
-
-No universal numeric acceptance threshold is claimed yet. Baselines and budgets are target-device evidence to be established in E-001/E-002 before controller admission.
+- maximizing “free RAM”;
+- forcing max clocks or disabling thermal throttling;
+- replacing Android LMKD/MemoryLimiter/MGLRU with another generic killer;
+- bypassing Android/Huawei security/integrity/banking/DRM controls;
+- guaranteeing that all apps stay resident;
+- claiming a platform feature exists on the target because AOSP documents it.
