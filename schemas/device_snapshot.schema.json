@@ -1,1 +1,26 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://example.invalid/fixhua/device_snapshot.schema.json","title":"FixHUA M0 device snapshot manifest","type":"object","required":["schemaVersion","createdUtc","files"],"properties":{"schemaVersion":{"const":1},"createdUtc":{"type":"string"},"files":{"type":"array","items":{"type":"object","required":["name","status"],"properties":{"name":{"type":"string"},"status":{"enum":["OK","MISSING","DENIED","ERROR"]},"source":{"type":"string"}}}}},"additionalProperties":true}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/fixhua/device_snapshot.schema.json",
+  "title": "FixHUA M0.2 device snapshot manifest",
+  "type": "object",
+  "required": ["schemaVersion", "probeVersion", "createdUtc", "files"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "probeVersion": {"const": "M0.2-ArmB"},
+    "createdUtc": {"type": "string"},
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status", "source"],
+        "properties": {
+          "name": {"type": "string"},
+          "status": {"enum": ["OK", "MISSING", "DENIED", "ERROR"]},
+          "source": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
