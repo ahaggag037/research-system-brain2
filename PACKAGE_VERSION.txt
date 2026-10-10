@@ -1,3 +1,3 @@
-V10.3-Clean-Repo-Knowledge-Package
-Architecture: FH-A1
-Created: 2026-10-10T03:43:59Z
+V10.3B-Arm-B-Research-Expanded-Knowledge-Package
+Architecture: FH-A2
+Historical baseline: FH-A1 / 0b114e4f224ebac957cf8245acd1002fa43081fa
