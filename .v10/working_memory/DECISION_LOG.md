@@ -1,16 +1,15 @@
-# DECISION LOG — FINAL DISTILLATION
+# DECISION LOG — compact operational history
 
-## D-001 — Clean-room canonical workspace
-STATUS: ACTIVE. Use only `ahaggag037/research-system-brain2` / `main` for user-repository work; persist state there. Reopen only if mission scope/repository authorization changes.
+Canonical architecture decisions are in `docs/architecture/DECISIONS.md`; this file preserves recovery history.
 
-## D-002 — Discovery remains architecture-neutral
-STATUS: SUPERSEDED by D-003. During early Discovery no optimizer/tweak product category was privileged.
+| ID | Status | Decision | Evidence / reopen |
+|---|---|---|---|
+| D-001 | ACTIVE | Use only `ahaggag037/research-system-brain2`/`main` as canonical user-repository workspace; no predecessor user repo evidence. | Mission boundary; reopen only if contract changes. |
+| D-002 | SUPERSEDED | Remain architecture-neutral during original discovery. | Superseded once evidence converged. |
+| D-003 | SUPERSEDED_BY_D-007 | Original V10.3-B selected FH-A1 evidence-gated supervisor. | Historical S-001..S-016; Arm B external research weakened topology. |
+| D-004 | ACTIVE | Preserve target uncertainty rather than fabricate device/APK readiness. | No Huawei target available. |
+| D-005 | ACTIVE/HISTORICAL_TOOL_LIMIT | Prior cold-start used authenticated GitHub reads after local clone DNS failure. | Re-test during Arm B. |
+| D-006 | ACTIVE | Reopen historical completion because independent external Internet research is now mandatory. | Arm B user contract + Q1..Q12. |
+| D-007 | ACTIVE | Select FH-A2 Incident-Centric Evidence Escalation Supervisor. | S-017..S-044; ADR-009..ADR-016; `ARCHITECTURE_REEVALUATION_ARM_B.md`. Reopen if M1 falsifies direct-evidence feasibility or a simpler stronger architecture emerges. |
 
-## D-003 — Evidence-gated supervisor selected
-STATUS: ACTIVE. C4 FH-A1 is the end-state architecture; diagnostic flight recorder is first useful foundation; continuity allocator is experimental; static tweaks rejected as core; aggressive root autotuning research-only. Reopen if target evidence shows insufficient observability or a materially simpler design achieves the same outcomes.
-
-## D-004 — Preserve target uncertainty rather than fabricate readiness
-STATUS: ACTIVE. Complete the knowledge mission while Android APK/device validation remain unimplemented/unverified; M1 is the exact next milestone.
-
-## D-005 — Connector-only GitHub cold-start after local clone DNS failure
-STATUS: ACTIVE. Direct clone failure was network/tooling only. Cold-start was performed from authenticated GitHub reads of canonical main; executable tests remained separately verified in mission container.
+Key consequence: direct version-qualified incident evidence outranks generic pressure inference; continuous app polling is not a correctness dependency; writes remain typed/qualified/rollback-gated.
