@@ -1,42 +1,16 @@
-# Risk-Transmutation Catalog
+# Arm B Risk Transmutation
 
-## RT-001 — Root kernel/system tuning
-- **Raw idea:** continuously tune scheduler/memory/cgroup/sysfs controls for performance.
-- **Benefit:** potentially large control reach.
-- **Hazard:** device-specific semantics, controller conflict, thermal/battery/stability regressions, persistence risk.
-- **Bounded redesign:** root is read-mostly first; any write is a typed actuator qualified per device/firmware with one-at-a-time canary, verification and rollback.
-- **Required observations:** actual path/owner/semantics, before/after user-visible metric, controller overwrite behavior, thermal/stability response.
-- **Abort:** no rollback, repeated overwrite, unstable effect, safety interaction.
-- **Shortest falsification:** E-005 on one reversible candidate after E-001.
-- **Disposition:** RESEARCH-ONLY until qualification.
+Research is useful when it turns risky ideas into bounded tests/contracts rather than merely rejecting them.
 
-## RT-002 — Keep high-value apps warm
-- **Raw idea:** pin/protect user-important apps so they never reload.
-- **Benefit:** better resume latency.
-- **Hazard:** worsens pressure/thrashing and harms foreground work; platform may legitimately reclaim them.
-- **Bounded redesign:** shadow-only continuity value estimates; never “pin everything”; prioritize diagnosis and user intent, and only consider bounded actions if pressure/outcome evidence supports them.
-- **Abort:** foreground jank/pressure rises, background semantics break, benefit not attributable.
-- **Experiment:** replay/controlled app-switch traces before any destructive behavior.
-- **Disposition:** EXPERIMENTAL CMP-010.
-
-## RT-003 — Freeze cached apps
-- **Raw idea:** freeze background apps to save resources.
-- **Benefit:** reduce CPU/wakeup while keeping processes resident.
-- **Hazard:** freezing does **not** free their resident memory and can break expected background behavior if applied arbitrarily.
-- **Bounded redesign:** observe platform freezer state where available; do not use manual freezer as a memory-pressure cure. Any future use requires app-role safeguards and E-005.
-- **Disposition:** DEFERRED/RESEARCH-ONLY.
-
-## RT-004 — Deep continuous tracing
-- **Raw idea:** collect Perfetto/system traces continuously for perfect diagnosis.
-- **Benefit:** rich evidence.
-- **Hazard:** CPU/wakeup/storage/self-interference and privacy.
-- **Bounded redesign:** low-cost ring buffer plus short user/triggered deep capture with explicit overhead measurement.
-- **Abort:** E-002 exceeds device-derived observer budget.
-- **Disposition:** SELECTED only in bounded two-speed form.
-
-## RT-005 — Automatic Huawei setting repair
-- **Raw idea:** root-edit hidden vendor state so apps always stay alive.
-- **Benefit:** convenience.
-- **Hazard:** undocumented schema/version drift, security/behavior breakage, false attribution.
-- **Bounded redesign:** settings assessment + documented intent/deep-link/user guidance first; programmable mutation only through documented stable APIs if discovered.
-- **Disposition:** SAFE ASSISTANT selected; hidden-store edit rejected.
+| Raw opportunity/risk | Transmuted safe form |
+|---|---|
+| Android MemoryLimiter might explain exits | read `status`/exit reason first; never modify vendor XML in product |
+| App memory budgets could constrain FixHUA overhead | capability-gated self-budget experiment after measured baseline; never universal constant |
+| Perfetto can reveal root causes | preconfigured triggered/bounded capture tier; no continuous high-cost trace |
+| cgroup memory controls can protect/reclaim | research actuator catalog only; exact ownership/rollback/target experiment required |
+| DAMON proactive reclaim | custom-kernel/research backend only unless target exposes supported semantics |
+| MGLRU PID/refault machinery | observe capability; do not duplicate page-hotness policy in app |
+| predictive relaunch ranking | shadow continuity hypothesis with calibration/fallback; no direct victim killing |
+| Huawei background settings | version-qualified supported UI guidance; no undocumented DB/system package manipulation |
+| ADPF/PerfGenius | use for FixHUA/app-scoped telemetry/self-adaptation if supported; never claim cross-app system control |
+| cross-UID incident history | explicit privilege/capability boundary; local-private data; redacted export |

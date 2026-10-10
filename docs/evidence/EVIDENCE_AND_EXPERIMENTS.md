@@ -1,36 +1,44 @@
-# Evidence, Claims, and Experiment Strategy
+# FH-A2 Evidence and Experiment Program
 
-## Evidence hierarchy
-Prefer, in order for target behavior:
-1. direct target-device observation with reproducible procedure;
-2. current AOSP/Linux/Huawei primary documentation/source code;
-3. controlled experiment on matching device/firmware;
-4. source-code/config inspection of the target build where lawful/available;
-5. strong technical literature;
-6. community anecdotes only as hypothesis generators.
+## Evidence semantics
+- Platform documentation/source proves **platform possibility/reference behavior**, not target presence.
+- Target read-only observation proves **capability/observability on that device/build**.
+- A correlated incident proves what was observed around that incident; it does not automatically prove general causality.
+- A paired/repeated intervention experiment can support a causal claim only when confounders and rollback are controlled.
 
-Public-source facts describe platform mechanisms, not guaranteed target-device capability. Capability remains `UNKNOWN` until scanned.
+## E-001 — M1 Capability & Incident Bootstrap
+**Goal:** establish exact target truth without writes.  
+**Collect:** device/build/API/full-SDK; `isLowMemoryKillReportSupported`; self/cross-UID start/exit history access by privilege tier; `am memory-limiter status` if supported; app-memory-budget API presence; cached freezer/cgroup v2/PSI/MGLRU/DAMON observability; Perfetto version/trigger feasibility; thermal headroom/status; Huawei policy/version surface; observer overhead.  
+**Incident proof:** capture at least one reproducible reload/exit/background-continuity incident and build a direct/indirect evidence timeline.  
+**Exit:** versioned DeviceProfile + gaps; zero system writes.
 
-## E-001 — Device evidence bootstrap
-**Status:** PROPOSED / next milestone.  
-**Hypothesis:** a read-only snapshot plus representative incident capture can distinguish enough mechanism classes to guide the first Android observer.  
-**Inputs:** actual Huawei device, normal + representative app-switch/jank scenario, no system write.  
-**Measure:** device/firmware profile, accessible PSI, meminfo/swap/zRAM clues, thermal state, load/I/O clues, permitted process/exit evidence, Huawei policy assessment, observer capability/denials.  
-**Falsify:** observables are too weak/ambiguous to separate candidate classes.  
-**Abort:** collection creates noticeable instability, privacy exposure or requires unsafe mutation.  
-**Impact:** fixes exact sensor set and unblocks M2 Android diagnostic APK.
+## E-002 — Observer Budget A/B
+Compare representative workflow with observer disabled vs each proposed capture tier. Record repetitions, thermal state/headroom, FixHUA anonymous RSS+swap where available, CPU/active duration, workflow latency/jank and capture success.  
+**Reject/trim:** any source whose cost distorts the outcome or exceeds a target-derived budget without unique information gain.
 
-## E-002 — Observer overhead budget
-A/B observer off vs baseline recorder vs triggered deep capture over the same workload. Measure CPU time, wakeups if accessible, resident memory, storage writes, battery/thermal trend and jank. If observer materially creates/hides the symptom, reduce sampling or remove the probe. Exact budget is target-derived, not invented here.
+## E-003 — Incident Attribution Falsification
+Fixture + target incidents across at least: LMK/global pressure, limiter (if available), freezer/frozen IPC (if reproducible), crash/ANR, platform policy and conflicting/unknown evidence.  
+**Pass:** direct reasons map only when version/capability supports them; conflicting evidence lowers confidence; unsupported low-memory reporting never turns SIGKILL into automatic LMK fact.
 
-## E-003 — State-estimator falsification
-Create controlled scenarios where feasible: memory pressure, CPU contention, I/O contention, thermal loading within safe ordinary use, Huawei background restriction, and known app crash. Compare multi-signal estimator with single-metric baselines. Contradictory evidence must reduce confidence/emit UNKNOWN rather than force a label.
+## E-004 — Platform Policy Diagnosis
+For exact Huawei build, compare documented App launch/battery/background/recents/network settings and Android standby restrictions against controlled continuity workflow. Change settings only through normal user-visible supported UI/API and record before/after.  
+**Goal:** separate policy-limited continuity from resource pressure.
 
-## E-004 — Huawei continuity diagnosis
-Under non-critical memory conditions, vary documented Huawei App Launch/background/battery settings for a consenting test app and observe continuity. Goal: prove the classifier can distinguish policy-limited behavior from global memory pressure. Do not automate undocumented vendor database edits.
+## E-005 — Startup/Continuity Outcome Baseline
+Use repeated physical-device switch/relaunch workflows. Classify cold/warm/hot where observable and record relaunch latency/TTID/TTFD when an appropriate harness exists. Keep thermal/control conditions stable enough for comparison.  
+**Goal:** create user-outcome baseline before policy optimization.
 
-## E-005 — Typed actuator qualification
-For each future actuator, independently: capability probe → semantic/source validation → shadow prediction → capture baseline/rollback → bounded canary → read-back verify → outcome window → forced-failure rollback test → qualification or rejection. No actuator inherits qualification from another device/firmware.
+## E-006 — Continuity Research Shadow Test
+Evaluate A2-009 ranking using user priority + relaunch distance/cost + footprint/background role. Use holdout periods and explicit fallback.  
+**No action:** prediction cannot directly kill/freeze/protect processes.  
+**Promotion condition:** stable predictive/outcome value with OOD/fallback behavior.
 
-## Claim promotion rule
-A hypothesis becomes target-verified only when evidence directly supports it on the target with provenance. An implementation becomes `TESTED` only for the exact environment/test actually run. Architecture docs must not use platform documentation as proof that a target control exists.
+## E-007 — Typed Actuator Qualification (future)
+For exactly one candidate write after M1–M3, document control owner, expected mechanism, scope, exclusions, baseline, abort, read-back, rollback, failure injection and repeated outcome trial. One actuator at a time.  
+**Reject:** any controller fight, non-repeatable benefit, material regression or rollback uncertainty.
+
+## Experiment outcome priority
+1. user-visible continuity/relaunch/responsiveness;
+2. correctness/stability/thermal/battery safeguards;
+3. mechanism evidence;
+4. proxy metrics (PSI/free RAM/clocks) only as explanatory context.

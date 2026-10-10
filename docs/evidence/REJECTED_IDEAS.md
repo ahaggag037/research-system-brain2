@@ -1,13 +1,19 @@
-# Rejected / Deferred Idea Memory
+# Rejected / Constrained Ideas — FH-A2
 
-| Idea | Why it looked promising | What invalidated it | Rejection | Reopen condition |
-|---|---|---|---|---|
-| Universal static tweak pack | fast, simple, easy to demonstrate | device/version variance, multiple causal mechanisms, controller conflict, no feedback | core architecture REJECTED | only a specific tweak with target evidence becomes a typed actuator |
-| Maximize free RAM | intuitive headroom metric | Android intentionally uses RAM for cached apps; free RAM does not express stalls/value | PERMANENT as objective | never as global objective; free memory may remain one observation |
-| Force maximum clocks | immediate benchmark boost | thermal/power framework and sustained stability matter; safety bypass forbidden | REJECTED | bounded documented performance hints could be studied per app/device |
-| Single PSI threshold controller | PSI is strong pressure signal | 2026 AOSP LMKD fix demonstrates full PSI can be misleading in some memcg cases | REJECTED | only if target experiment proves a narrowly scoped signal with guards |
-| Freeze apps to solve memory pressure | keeps cached apps quiet | freezer reduces CPU activity but retains resident memory | REJECTED for memory relief | may be studied for CPU/wakeup behavior with safeguards |
-| Pin/protect every user app | reduces cold starts | increases pressure and can harm foreground workload | REJECTED | user-value allocator may protect a bounded subset after experiments |
-| Persistent root daemon from day one | easiest continuous control | unverified need, battery/reliability/security and recovery burden | DEFERRED | E-001/E-002 prove persistent access required and safe |
-| Undocumented Huawei database edits | direct automation | unstable/version-specific, unsupported, hard to recover | REJECTED | documented supported API emerges |
-| Continuous deep tracing | maximum observability | self-interference/storage/privacy | REJECTED | bounded triggered capture already preserves value |
+| Idea | Disposition | Evidence/reason |
+|---|---|---|
+| Static “performance tweak pack” | REJECTED as core | Multiple controllers/causes; target semantics vary. |
+| Maximize free RAM | REJECTED objective | Reclaim/cache/swap are normal; continuity can worsen when useful residency is destroyed. |
+| Max clocks / disable thermal protections | REJECTED | Thermal framework/ADPF show sustainable performance is dynamic; safety boundary. |
+| One PSI/free-RAM threshold decides cause/action | REJECTED | LMKD/AOSP ambiguity + distinct MemoryLimiter/policy/freezer causes. |
+| Continuous app-level recorder is universal truth | REJECTED | cached freezer/background quotas interrupt ordinary app execution; observer overhead. |
+| Freeze apps to relieve memory | REJECTED mechanism | freezer retains memory; also has Binder failure semantics. |
+| Second generic userspace OOM killer on retail Android | REJECTED | duplicates/fights LMKD, MemoryLimiter and vendor controllers. |
+| Hard-code cgroup/sysfs/vendor paths | REJECTED | Android task-profile/vendor overrides; target-specific. |
+| Direct cgroup/DAMON/MGLRU writes in M1/M2 | REJECTED | strong/risky controls; target ownership/safety unverified. |
+| Delete/disable Huawei system-management packages | REJECTED | undocumented/destructive; no supported contract; can destabilize device. |
+| Treat Huawei PerfGenius as global optimizer | REJECTED | vendor SDK is integrated app-scoped performance API. |
+| User-space page-hotness controller | REJECTED stock design | MGLRU/kernel reclaim owns page-level feedback on capable systems. |
+| Predictive continuity ranking directly kills apps | REJECTED initial production | research shows prediction/calibration limitations; background semantics and target causality unresolved. |
+| AppFlow/Ariadne copied into stock app | REJECTED feasibility | reported gains require framework/kernel implementation. |
+| Persistent root daemon on day one | REJECTED | unnecessary for incident-first M2 and increases safety/recovery cost. |
