@@ -1,15 +1,28 @@
 {
-  "schemaVersion":1,
-  "requirementIds":["R-001","R-002","R-003","R-004","R-005","R-006","R-007","R-008","R-009","R-010","R-011","R-012","R-013","R-014","R-015","R-016","R-017","R-018","R-019","R-020","R-021","R-022","R-023","R-024","R-025","R-026","R-027","R-028","R-029","R-030","R-031","R-032","R-033","R-034","R-035","R-036","R-037","R-038","R-039","R-040","R-041","R-042","R-043","R-044","R-045","R-046","R-047","R-048","R-049","R-050","R-051","R-052","R-053","R-054","R-055","R-056","R-057","R-058","R-059","R-060","R-061","R-062","R-063","R-064","R-065","R-066","R-067","R-068","R-069","R-070","R-071","R-072","R-073","R-074","R-075","R-076","R-077","R-078","R-079","R-080","R-081","R-082","R-083","R-084","R-085","R-086","R-087","R-088","R-089","R-090"],
-  "entities":[
-    {"id":"FH-A1","type":"architecture"},{"id":"CMP-001","type":"component"},{"id":"CMP-002","type":"component"},{"id":"CMP-003","type":"component"},{"id":"CMP-004","type":"component"},{"id":"CMP-005","type":"component"},{"id":"CMP-006","type":"component"},{"id":"CMP-007","type":"component"},{"id":"CMP-008","type":"component"},{"id":"CMP-009","type":"component"},{"id":"CMP-010","type":"component"},
-    {"id":"ADR-001","type":"decision"},{"id":"ADR-002","type":"decision"},{"id":"ADR-003","type":"decision"},{"id":"ADR-004","type":"decision"},{"id":"ADR-005","type":"decision"},{"id":"ADR-006","type":"decision"},{"id":"ADR-007","type":"decision"},{"id":"ADR-008","type":"decision"},
-    {"id":"E-001","type":"experiment"},{"id":"E-002","type":"experiment"},{"id":"E-003","type":"experiment"},{"id":"E-004","type":"experiment"},{"id":"E-005","type":"experiment"},
+  "schemaVersion": 2,
+  "architectureId": "FH-A2",
+  "historicalArchitectureIds": ["FH-A1"],
+  "requirementIds": ["R-001","R-002","R-003","R-004","R-005","R-006","R-007","R-008","R-009","R-010","R-011","R-012","R-013","R-014","R-015","R-016","R-017","R-018","R-019","R-020","R-021","R-022","R-023","R-024","R-025","R-026","R-027","R-028","R-029","R-030","R-031","R-032","R-033","R-034","R-035","R-036","R-037","R-038","R-039","R-040","R-041","R-042","R-043","R-044","R-045","R-046","R-047","R-048","R-049","R-050","R-051","R-052","R-053","R-054","R-055","R-056","R-057","R-058","R-059","R-060","R-061","R-062","R-063","R-064","R-065","R-066","R-067","R-068","R-069","R-070","R-071","R-072","R-073","R-074","R-075","R-076","R-077","R-078","R-079","R-080","R-081","R-082","R-083","R-084","R-085","R-086","R-087","R-088","R-089","R-090","R-091","R-092","R-093","R-094","R-095","R-096","R-097","R-098","R-099","R-100","R-101","R-102","R-103","R-104","R-105","R-106"],
+  "entities": [
+    {"id":"A2-001","type":"component"},{"id":"A2-002","type":"component"},{"id":"A2-003","type":"component"},{"id":"A2-004","type":"component"},{"id":"A2-005","type":"component"},{"id":"A2-006","type":"component"},{"id":"A2-007","type":"component"},{"id":"A2-008","type":"component"},{"id":"A2-009","type":"component"},
+    {"id":"ADR-001","type":"decision"},{"id":"ADR-002","type":"decision"},{"id":"ADR-003","type":"decision"},{"id":"ADR-004","type":"decision"},{"id":"ADR-005","type":"decision"},{"id":"ADR-006","type":"decision"},{"id":"ADR-007","type":"decision"},{"id":"ADR-008","type":"decision"},{"id":"ADR-009","type":"decision"},{"id":"ADR-010","type":"decision"},{"id":"ADR-011","type":"decision"},{"id":"ADR-012","type":"decision"},{"id":"ADR-013","type":"decision"},{"id":"ADR-014","type":"decision"},{"id":"ADR-015","type":"decision"},{"id":"ADR-016","type":"decision"},
+    {"id":"E-001","type":"experiment"},{"id":"E-002","type":"experiment"},{"id":"E-003","type":"experiment"},{"id":"E-004","type":"experiment"},{"id":"E-005","type":"experiment"},{"id":"E-006","type":"experiment"},{"id":"E-007","type":"experiment"},
     {"id":"RISK-001","type":"risk"},{"id":"RISK-002","type":"risk"},{"id":"RISK-003","type":"risk"},{"id":"RISK-004","type":"risk"},{"id":"RISK-005","type":"risk"},{"id":"RISK-006","type":"risk"},
-    {"id":"M0","type":"stage"},{"id":"M1","type":"stage"},{"id":"M2","type":"stage"},{"id":"M3","type":"stage"},{"id":"M4","type":"stage"},{"id":"M5","type":"stage"},{"id":"M6","type":"stage"},{"id":"F-001","type":"audit_defect"},{"id":"B-001","type":"blocker"},{"id":"CP-005","type":"handoff_checkpoint"}
+    {"id":"FH-A1","type":"historical_architecture"},{"id":"FH-A2","type":"architecture"},{"id":"B-001","type":"blocker"},{"id":"F-001","type":"historical_audit_defect"},
+    {"id":"M0.2","type":"stage"},{"id":"M1","type":"stage"},{"id":"M2","type":"stage"},{"id":"M3","type":"stage"},{"id":"M4","type":"stage"},{"id":"M5","type":"stage"},{"id":"M6","type":"stage"}
   ],
-  "edges":[
-    {"from":"ADR-001","to":"FH-A1","relation":"selects"},{"from":"FH-A1","to":"CMP-004","relation":"contains"},{"from":"FH-A1","to":"CMP-006","relation":"contains"},{"from":"RISK-001","to":"CMP-006","relation":"mitigated_by"},{"from":"RISK-003","to":"CMP-003","relation":"constrains"},{"from":"RISK-004","to":"CMP-005","relation":"constrains"},{"from":"RISK-005","to":"CMP-007","relation":"mitigated_by"},{"from":"E-001","to":"M1","relation":"gates"},{"from":"E-002","to":"M2","relation":"validates"},{"from":"E-005","to":"M5","relation":"gates"},{"from":"CMP-010","to":"M6","relation":"implemented_in"},{"from":"F-001","to":"M0","relation":"repaired_in"},{"from":"B-001","to":"M1","relation":"resolved_by"},{"from":"R-077","to":"CP-005","relation":"validated_by"},{"from":"R-087","to":"CP-005","relation":"packaged_by"}
+  "edges": [
+    {"from":"ADR-009","to":"FH-A2","relation":"selects"},{"from":"FH-A1","to":"FH-A2","relation":"superseded_by"},{"from":"ADR-010","to":"A2-004","relation":"defines"},{"from":"ADR-011","to":"A2-003","relation":"defines"},{"from":"ADR-012","to":"A2-007","relation":"defines"},{"from":"ADR-013","to":"A2-005","relation":"defines"},{"from":"ADR-014","to":"A2-009","relation":"constrains"},{"from":"ADR-015","to":"A2-004","relation":"constrains"},{"from":"ADR-016","to":"A2-008","relation":"simplifies"},{"from":"R-092","to":"ADR-009","relation":"requires_research_for"},{"from":"R-096","to":"FH-A2","relation":"satisfied_by_reconvergence"},{"from":"E-001","to":"M1","relation":"gates"},{"from":"E-002","to":"M1","relation":"validates_observer_budget"},{"from":"E-003","to":"M2","relation":"validates_attribution"},{"from":"E-005","to":"M3","relation":"establishes_outcome_baseline"},{"from":"E-006","to":"M4","relation":"validates_continuity_shadow"},{"from":"E-007","to":"M5","relation":"gates_actuator"},{"from":"B-001","to":"M1","relation":"blocks_target_results"}
   ],
-  "canonicalDocuments":{"architecture":"docs/architecture/ARCHITECTURE.md","decisions":"docs/architecture/DECISIONS.md","components":"docs/architecture/COMPONENT_CONTRACTS.md","tests":"docs/implementation/TEST_MATRIX.md","experiments":"docs/evidence/EVIDENCE_AND_EXPERIMENTS.md","visuals":"VISUAL_TRACEABILITY.json","audit":"FINAL_AUDIT.md","handoff":"HANDOFF_CHECKPOINT.md"}
+  "canonicalDocuments": {
+    "researchExpansion":"docs/evidence/EXTERNAL_RESEARCH_EXPANSION_ARM_B.md",
+    "architectureReevaluation":"docs/architecture/ARCHITECTURE_REEVALUATION_ARM_B.md",
+    "architecture":"docs/architecture/ARCHITECTURE.md",
+    "decisions":"docs/architecture/DECISIONS.md",
+    "components":"docs/architecture/COMPONENT_CONTRACTS.md",
+    "tests":"docs/implementation/TEST_MATRIX.md",
+    "experiments":"docs/evidence/EVIDENCE_AND_EXPERIMENTS.md",
+    "visuals":"VISUAL_TRACEABILITY.json",
+    "armBDelta":"docs/project/ARM_B_CHANGELOG.md"
+  }
 }
