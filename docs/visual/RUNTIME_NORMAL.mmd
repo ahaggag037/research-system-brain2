@@ -1,16 +1,22 @@
 sequenceDiagram
-  participant U as User/CMP-001
-  participant C as CMP-002 Capability
-  participant O as CMP-003 Observer
-  participant E as CMP-004 Estimator
-  participant P as CMP-005 Policy
-  participant S as CMP-008 Store
-  U->>C: start diagnose / refresh profile
-  C-->>U: DeviceProfile + UNKNOWNs
-  U->>O: start bounded session
-  O->>S: samples / incident window
-  O->>E: evidence bundle
-  E-->>P: StateEstimate + confidence
-  P-->>U: NO_OP / capture / guidance / shadow candidate
-  P->>S: decision provenance
-  Note over U,P: Initial builds do not execute privileged writes
+  participant U as User / A2-001
+  participant P as A2-002 Profiler
+  participant I as A2-003 Incident Engine
+  participant C as A2-004 Capture
+  participant V as A2-007 Platform Policy
+  participant S as A2-008 Store
+  U->>P: open diagnose / validate DeviceProfile
+  P-->>U: capabilities + UNKNOWNs
+  U->>I: mark/review incident
+  I->>I: query direct exit/start records available
+  I->>V: request policy context if relevant
+  V-->>I: versioned policy assessment / UNKNOWN
+  alt direct evidence sufficient
+    I-->>U: attribution + confidence + provenance
+  else material evidence gap
+    I->>C: request minimum evidence tier
+    C-->>I: bounded bundle + observer cost
+    I-->>U: revised attribution / remaining gap
+  end
+  I->>S: incident + evidence + attribution
+  Note over U,S: No continuous recorder or privileged write is required for correctness

@@ -1,20 +1,27 @@
 stateDiagram-v2
   [*] --> Home
-  Home --> Diagnose: Diagnose a problem
-  Diagnose --> Capturing: Start read-only session
-  Capturing --> Report: Mark incident / finish
-  Report --> Unknown: insufficient/conflicting evidence
-  Report --> Guidance: documented Huawei policy likely
-  Report --> Evidence: resource/thermal/I/O evidence available
-  Unknown --> Diagnose: collect missing evidence
-  Guidance --> Verify: user changes documented setting
-  Verify --> Report: repeat observation
-  Evidence --> Shadow: future policy evaluates candidate
-  Shadow --> NoOp: not qualified / low expected value
-  Shadow --> SafetyReview: qualified candidate exists
-  SafetyReview --> Applied: explicit future typed canary
-  SafetyReview --> NoOp: safety/rollback gate fails
-  Applied --> Recovered: regression/failure -> rollback
-  Applied --> Report: verified outcome
-  Recovered --> Report
-  NoOp --> Report
+  Home --> Incident: Diagnose reload / exit / jank / background failure
+  Incident --> DirectEvidence: Query available direct OS history
+  DirectEvidence --> Attribution: sufficient evidence
+  DirectEvidence --> EvidenceGap: missing / denied / conflicting
+  EvidenceGap --> Snapshot: Tier 1 cheap snapshot
+  Snapshot --> Attribution
+  EvidenceGap --> TriggerTrace: Tier 2 triggered trace if supported + justified
+  TriggerTrace --> Attribution
+  EvidenceGap --> PrivRead: Tier 3 explicit read session if necessary
+  PrivRead --> Attribution
+  Attribution --> Unknown: unresolved / mixed evidence
+  Attribution --> Guidance: platform/vendor policy guidance
+  Attribution --> Baseline: measurable resource/continuity cause
+  Unknown --> Incident: refine/reproduce
+  Guidance --> Verify: user applies supported setting if desired
+  Verify --> Incident: repeat workflow
+  Baseline --> Shadow: paired/repeated experiment
+  Shadow --> NoOp: no repeatable benefit / regression / unsafe
+  Shadow --> SafetyReview: future qualified typed candidate
+  SafetyReview --> NoOp: qualification/rollback gate fails
+  SafetyReview --> Applied: bounded canary
+  Applied --> Recovered: failure -> rollback
+  Applied --> Attribution: verified outcome evidence
+  Recovered --> Attribution
+  NoOp --> Attribution

@@ -1,27 +1,28 @@
 flowchart LR
-  U["V-UI / CMP-001\nApp + Session UI"] --> CAP["V-CAP / CMP-002\nCapability Scanner"]
-  U --> OBS["V-OBS / CMP-003\nFlight Recorder"]
-  CAP --> OBS
-  OBS --> EST["V-EST / CMP-004\nState Estimator"]
-  EST --> POL["V-POL / CMP-005\nShadow Policy"]
-  POL -->|NO_OP / guidance| U
-  POL --> PRIV["V-PRIV / CMP-006\nTyped Privilege Gateway"]
-  U --> HUA["V-HUA / CMP-007\nHuawei Assistant"]
-  CAP --> STORE["V-STORE / CMP-008\nEvidence Store"]
-  OBS --> STORE
-  EST --> STORE
-  POL --> STORE
+  U["V2-UI / A2-001\nIncident Session Coordinator"] --> PROF["V2-PROFILE / A2-002\nCapability & Platform Profiler"]
+  U --> INC["V2-INCIDENT / A2-003\nIncident Evidence Engine"]
+  PROF --> INC
+  INC -->|evidence gap| CAP["V2-CAPTURE / A2-004\nTiered Capture Orchestrator"]
+  CAP -->|bounded bundle| INC
+  PROF --> POLICY["V2-PLATFORM / A2-007\nPlatform Policy Adapter"]
+  POLICY --> INC
+  INC --> EXP["V2-EXPERIMENT / A2-005\nExperiment & Shadow Evaluator"]
+  EXP -->|NO_OP / guidance| U
+  EXP -->|qualified typed candidate only| PRIV["V2-PRIV / A2-006\nTyped Privilege Gateway"]
+  PROF --> STORE["V2-STORE / A2-008\nEvidence Store + Redacted Reporting"]
+  INC --> STORE
+  CAP --> STORE
+  POLICY --> STORE
+  EXP --> STORE
   PRIV --> STORE
-  HUA --> STORE
-  STORE --> REP["V-REP / CMP-009\nReport / Redacted Export"]
-  REP --> U
-  STORE -. shadow data .-> CONT["V-CONT / CMP-010\nContinuity Allocator\nEXPERIMENTAL"]
-  CONT -. candidate only .-> POL
-  subgraph P["Privileged boundary"]
+  STORE --> U
+  STORE -. shadow history .-> CONT["V2-CONT / A2-009\nContinuity Research\nEXPERIMENTAL"]
+  CONT -. hypothesis only .-> EXP
+  SYS[("Android / Huawei / Linux\nplatform controllers")]
+  PROF -->|read/capability probes| SYS
+  CAP -->|minimum read tier| SYS
+  POLICY -->|documented policy facts/guidance| SYS
+  PRIV -->|typed qualified write only| SYS
+  subgraph PB["Privileged boundary"]
     PRIV
   end
-  SYS[("Android / Huawei\nplatform controllers")]
-  CAP -->|read probes| SYS
-  OBS -->|read observations| SYS
-  PRIV -->|qualified typed write only| SYS
-  HUA -->|documented settings guidance| SYS

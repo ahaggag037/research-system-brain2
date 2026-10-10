@@ -1,25 +1,30 @@
 sequenceDiagram
-  participant P as CMP-005 Policy
-  participant G as CMP-006 Privilege Gateway
+  participant I as A2-003 Incident Engine
+  participant E as A2-005 Experiment/Shadow
+  participant G as A2-006 Privilege Gateway
   participant A as Qualified Actuator
-  participant O as CMP-003 Observer
-  participant S as CMP-008 Store
-  P->>G: typed CandidateAction
-  G->>G: verify exact profile + qualification + exclusions
-  alt not qualified / unsafe / uncertain
-    G-->>P: REJECT / NO_OP
-  else qualified
-    G->>G: capture SafetySnapshot + journal
-    G->>A: apply bounded operation
-    A-->>G: read-back
-    G->>O: canary observation
-    alt postcondition and health pass
-      G->>S: outcome evidence
-      G-->>P: VERIFIED_SUCCESS
-    else failure / controller fight / regression
-      G->>A: rollback
-      A-->>G: rollback read-back
-      G->>S: failure + suspension evidence
-      G-->>P: ROLLED_BACK / CRITICAL_FAULT if unresolved
+  participant S as A2-008 Store
+  I->>E: attribution + outcome baseline + gaps
+  E->>E: paired/repeated evidence + thermal/control conditions
+  alt uncertain / no repeatable user benefit
+    E-->>I: NO_OP / more evidence / guidance
+  else candidate qualifies for canary
+    E->>G: typed CandidateAction + qualification ref
+    G->>G: exact device/firmware + bounds + rollback recheck
+    alt stale / unsafe / unqualified
+      G-->>E: REJECT
+    else qualified
+      G->>G: capture SafetySnapshot + journal
+      G->>A: one bounded operation
+      A-->>G: read-back
+      alt postcondition + user outcome guard pass
+        G->>S: verified canary outcome
+        G-->>E: VERIFIED_SUCCESS
+      else failure / regression / controller fight
+        G->>A: rollback
+        A-->>G: rollback read-back
+        G->>S: failure + qualification suspension
+        G-->>E: ROLLED_BACK / CRITICAL_FAULT if unresolved
+      end
     end
   end
