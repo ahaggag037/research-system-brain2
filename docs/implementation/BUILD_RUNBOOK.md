@@ -1,31 +1,18 @@
-# Build / Run / Install Runbook
+# Build / Run / Install Runbook — FH-A2
 
 ## Current implementation reality
-The repository currently contains a **host-side reference diagnostic utility**, not an Android APK. Android M2 is specified but not created, so Android SDK/Gradle versions are intentionally `UNKNOWN` rather than invented.
+The repository contains **M0.2 read-only shell probe + host analyzer/tests/validators**, not an Android APK. FH-A2 Android M2 is specified but not implemented; Android toolchain versions remain `UNKNOWN` until M1/M2 bootstrap rather than being guessed.
 
-## Current toolchain (M0)
-- POSIX-ish Android shell for `tools/device_probe.sh` (`sh`, `cat`, `getprop`, optional `dumpsys`).
-- Host Python 3.10+ standard library for analyzer/tests (expected to work on newer Python 3.x; tested in the mission environment in State D).
-- ADB is optional but convenient for moving the script/snapshot.
-
-## Repository layout
-- `tools/` — M0 probe/analyzer and validators.
-- `tests/` — host reference tests.
-- `schemas/` — machine-readable snapshot/report schema.
-- `docs/` — canonical architecture/evidence/implementation/visual system.
-- `.v10/working_memory/` — operational scratch, noncanonical after distillation.
-- root JSON files — project state/navigation/traceability.
-
-## Host test
+## M0.2 host verification
 ```bash
 python -m unittest discover -s tests -v
 python tools/validate_repo.py .
+python tools/final_audit_check.py .   # final-state checks; may intentionally fail during active edits
+sh -n tools/device_probe.sh
+python -m py_compile tools/*.py tests/*.py
 ```
 
-## Run the read-only device probe
-The script only reads system metadata/`/proc`/safe `dumpsys` output and writes into the supplied **user-writable snapshot directory**. It does not write system settings, sysfs, procfs or cgroups.
-
-Example with ADB:
+## Run the read-only target probe
 ```bash
 adb push tools/device_probe.sh /data/local/tmp/fixhua_device_probe.sh
 adb shell chmod 700 /data/local/tmp/fixhua_device_probe.sh
@@ -33,34 +20,33 @@ adb shell 'rm -rf /data/local/tmp/fixhua-snapshot && sh /data/local/tmp/fixhua_d
 adb pull /data/local/tmp/fixhua-snapshot ./private-device-snapshots/fixhua-snapshot
 python tools/analyze_snapshot.py ./private-device-snapshots/fixhua-snapshot --out ./private-device-snapshots/report.json
 ```
-Do not commit `private-device-snapshots/` to this public repository.
+`private-device-snapshots/` is gitignored and must stay private by default.
 
-## Android M2 environment bootstrap — not yet executed
-Smallest verification step:
-1. On the implementation machine, inspect installed JDK/Android SDK or create a current empty Android app with Android Studio/Gradle.
-2. Select a supported `compileSdk`, `minSdk` based on the **actual target API**, JDK and Android Gradle Plugin combination from current Android documentation/tool output.
-3. Commit the Gradle wrapper and exact versions/checksums in the same change that creates M2 modules.
-4. Update this runbook + `PROJECT_STATE.json` from UNKNOWN to VERIFIED/IMPLEMENTED.
+The probe only reads optional system facts. `am memory-limiter status` is read-only; **do not** substitute `am memory-limiter ignore` or `manual` in M0/M1. Missing/denied commands are recorded rather than treated as false capability.
 
-Until that step, do **not** claim `BUILD_READY` for Android.
+## M1 manual evidence checklist
+After the probe, use only read/API checks needed by `FIRST_BUILD_CRITICAL_PATH.md`. Record command/API, version, privilege and result. Do not hard-code a node/path because AOSP lists it. Do not copy consumer-support UI paths without checking exact target version.
 
-## Planned Android variants
-- `debug`: local/device diagnostics; verbose diagnostic UI; no release signing.
-- `release`: future daily build; release signing outside repository.
-- Experimental privileged actuator support must be a separately gated feature/config and cannot silently ship enabled.
+## Android M2 bootstrap — not yet executed
+1. Read actual target API/full-SDK and available build environment.
+2. Select a current supported JDK/AGP/Gradle/compileSdk/minSdk combination from official Android docs/tool output.
+3. Commit Gradle wrapper and exact versions in same change as Android project bootstrap.
+4. Update this runbook + `PROJECT_STATE.json` from UNKNOWN to actual values.
+5. CI: validate docs/JSON → host tests → Android unit/contract tests → clean debug build → archive artifact/test reports.
+6. Device lane: install/launch target smoke + no-write audit + observer-budget subset.
 
-## CI path (planned M2)
-Checkout → validate machine-readable docs → run unit/contract tests → Gradle clean assembleDebug → archive unsigned/debug APK + test reports. A device/emulator lane runs install/launch smoke; target Huawei lane remains required for DEVICE_TEST_READY.
+## Planned variants
+- `debug`: diagnostics and evidence visibility; no release signing.
+- `release`: future daily build; signing secrets outside repository.
+- experimental privileged write support: separate feature/config, default disabled and gated by qualification record.
 
-## Signing boundary
-Never commit private keys, keystores, passwords, API secrets or root-broker credentials. Release signing must use local secure storage or CI secret store. Repository may contain only public certificate fingerprints/verification instructions after a release process exists.
-
-## Clean rebuild / artifact-source proof
-For M0: delete Python cache/output, rerun tests/validator.  
-For M2 later: `./gradlew clean test assembleDebug` from a clean checkout; record Git commit SHA and APK SHA-256 in build evidence. Artifact provenance must point to exact commit + CI run or local reproducible command.
+## Artifact proof
+Every APK/build artifact must map to exact Git commit + reproducible command/CI run + SHA-256. Host M0.2 proof is test output from the exact tree.
 
 ## Common failures
-- `adb` absent → install platform-tools externally; M0 host tests still run.
-- permission denied reading a probe → expected; command status records denial and capability remains UNOBSERVABLE.
-- parser input missing → analyzer returns unknown/missing field, not a fabricated zero.
-- Android tool version mismatch later → follow Gradle/AGP error, lock compatible versions, update runbook/state in same change rather than guessing.
+- `adb` absent: host tests still run; target M1 blocked.
+- optional probe denied/missing: expected capability result; do not retry with writes.
+- MemoryLimiter unavailable: do not infer Android 17 behavior applies to target.
+- Perfetto trigger unavailable: fall back to T1 snapshot; do not force continuous tracing.
+- thermal headroom NaN/unsupported: record capability gap and use available thermal status/context.
+- Android tool mismatch: use tool/official compatibility evidence and update runbook/state; do not invent versions.

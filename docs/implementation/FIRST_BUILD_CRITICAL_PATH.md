@@ -1,53 +1,69 @@
-# First-Build Critical Path
+# FH-A2 First-Build Critical Path
 
-## A. First useful build — current repository utility
-1. Checkout repository.
-2. Run `python -m unittest discover -s tests -v`.
-3. Copy/run `tools/device_probe.sh` on the device as documented in `BUILD_RUNBOOK.md`.
-4. Pull the snapshot directory.
-5. Run `python tools/analyze_snapshot.py <snapshot_dir> --out report.json`.
-6. Review `observability`, pressure summaries and unknowns. Do not tune the phone from this report alone.
+## M0.2 — first useful build (IMPLEMENTED / host-tested)
+1. Run host tests and repository validator.
+2. Run `tools/device_probe.sh` on the target in an Android shell. The probe writes only to the supplied output directory.
+3. Pull snapshot privately and run `tools/analyze_snapshot.py`.
+4. Review observability/capability facts and pressure context; do not call the report incident causality.
 
-**Exit:** schema-valid report is produced and no device state is changed by the probe.
+Arm B additions: read-only `/proc/swaps`, cgroup-v2 controller file, MGLRU enabled file, `am memory-limiter status` when available, Perfetto version, plus existing PSI/meminfo/thermal metadata.
 
-## B. First installable/testable Android build — M2
-Minimum components: CMP-001, CMP-002, CMP-003, conservative CMP-004, CMP-008, CMP-009, plus CMP-007 shell/UI guidance if cheap. CMP-005/006/010 may be stubbed **only as disabled interfaces**; no fake actuation.
+**M0.2 exit:** schema-valid report, no device/system writes, unsupported mechanisms remain missing/unknown.
+
+## M1 — Incident & Capability Bootstrap (BLOCKED_BY_DEVICE_EVIDENCE)
+Cannot be stubbed. On exact target:
+1. fingerprint model/firmware/API/full-SDK/vendor branch;
+2. run M0.2 and retain raw snapshot privately;
+3. test low-memory-exit-report support and self/cross-UID ApplicationExitInfo access per privilege tier;
+4. test ApplicationStartInfo availability/history access;
+5. read MemoryLimiter status only if command exists; do not use `ignore`/`manual`;
+6. test app-memory-budget API presence without imposing a budget;
+7. record freezer/cgroup v2/PSI/MGLRU/DAMON observability only;
+8. test Perfetto version and a bounded trigger smoke if safely configurable;
+9. identify Huawei EMUI/HarmonyOS policy UI/version using current official docs + actual UI;
+10. test Thermal API/headroom behavior/cadence;
+11. reproduce at least one real incident and build an evidence timeline;
+12. run E-002 observer-cost A/B.
+
+**M1 exit:** DeviceProfile + one replayable incident + observer budget evidence; zero privileged writes.
+
+## M2 — first installable/testable Android build
+Minimum modules/components: A2-001, A2-002, A2-003, A2-004 with T0/T1 only initially, A2-007, A2-008. A2-005 is `NO_OP`/shadow-only; A2-006 is a disabled write gateway; A2-009 absent/experimental.
 
 ### Exact order
-1. **M1 target evidence** — cannot be stubbed; selects actual observable set.
-2. Lock Android project toolchain/JDK/SDK/Gradle based on a clean generated project; commit wrapper/checksums.
-3. Implement `core-model` schemas + serialization/migration and fixture tests.
-4. Implement capability adapters only for M1-proven sources.
-5. Implement recorder with overhead instrumentation and bounded incident capture.
-6. Implement state estimator with UNKNOWN/conflict semantics; port reference fixtures.
-7. Implement local evidence store + retention + corruption recovery.
-8. Implement UI session/status/report/error states.
-9. Implement redacted export and Huawei documented-settings assistant.
-10. Build debug APK in CI and locally; install smoke on target.
-11. Run E-002 observer-overhead A/B and failure matrix subset.
+1. Finish M1 (cannot be bypassed).
+2. Lock current JDK/SDK/AGP/Gradle from actual implementation tool output; commit wrapper/checksums.
+3. Implement versioned core models and migration fixtures.
+4. Implement only M1-proven public/read adapters; no fake cross-UID access.
+5. Implement incident intake + direct start/exit correlation where supported.
+6. Implement attribution fallback/context using conservative snapshot evidence.
+7. Implement local store + retention + corruption recovery + redacted reporting.
+8. Implement Platform Policy Adapter for exact target family/version.
+9. Implement bounded T1 capture; T2 Perfetto only after target trigger feasibility passes.
+10. Build debug APK; install/launch on target; run no-write audit.
+11. Run E-002/E-003/E-005 subset.
 
-### Parallel after step 2
-- UI skeleton ↔ state store ↔ parser fixture work ↔ settings guidance ↔ CI.
-- Integration waits on stable schemas/interfaces.
+### Mandatory M2 exit tests
+- schema/migration;
+- denied/unsupported capability distinction;
+- version-aware exit/start parser fixtures;
+- direct-vs-heuristic conflict → conservative attribution;
+- lifecycle/cancellation and capture timeout;
+- observer-budget shedding;
+- local-state corruption recovery;
+- redacted export;
+- debug build/install/launch;
+- no-write static/runtime audit;
+- physical-target observer A/B.
 
-### May be stubbed temporarily
-- CMP-005 as `NO_OP` only;
-- CMP-006 as `DisabledPrivilegeGateway` that rejects writes;
-- CMP-010 absent/disabled.
+## M3 — daily incident forensics
+Requires stable M2 across representative workload, validated observer budget, privacy/retention, firmware invalidation, bounded incident capture and no high-severity crash/data-loss issue. Privileged writes are not required.
 
-### Must not be stubbed
-- capability truth/UNKNOWN handling;
-- local schema/migration;
-- recorder stop/cancellation;
-- privacy/redaction boundary;
-- no-write guarantee for M2;
-- build/install smoke on actual target.
+## M4 — continuity shadow research
+Implement A2-009 prediction/calibration with no kill/freeze actuation. Evaluate real user workflow holdouts and fallback behavior.
 
-### Mandatory tests before first APK exit
-schema unit tests, denied-capability tests, estimator conflict→UNKNOWN, recorder lifecycle, state corruption fallback, export redaction, debug build, APK install/launch, no-write audit, E-002 preliminary overhead.
+## M5 — first actuator canary (optional)
+Only if a specific candidate has causal target evidence, unique value over guidance/no-op, exact ownership/bounds, rollback and repeated target benefit. One actuator at a time.
 
-### Blocking unknowns
-Exact Android API/EMUI/HarmonyOS branch, available diagnostics/permissions and chosen explicit shell/root-read broker are M1 outcomes. Until then `BUILD_READY` is false.
-
-## C. First daily-usable build — M3
-Requires a stable M2 across representative daily workload, overhead budget established, retention/privacy behavior verified, firmware-change invalidation working, and no open high-severity crash/data-loss issue. Privileged writes are not required for DAILY_USE_READY.
+## M6 — custom-system research backend (optional/separate)
+Framework/kernel ideas inspired by AppFlow/Ariadne/DAMON/cgroup control belong here. M6 must not silently redefine stock-device capability.

@@ -1,21 +1,13 @@
-# Objective Readiness States
+# Readiness Definitions — FH-A2
 
-## ARCHITECTURE_READY
-All MUST architecture requirements mapped; stable architecture/ADRs/contracts/data/privilege/recovery; serious alternatives challenged; critical unknowns have tests; visual twin consistent. **Expected true after final package audit.**
+- `RESEARCH_RECONVERGED`: mandatory external research complete, architecture reevaluated, source/decision delta traceable.
+- `M0_HOST_TESTED`: read-only probe/analyzer source passes host tests/validators; says nothing about target command availability.
+- `DEVICE_PROFILE_READY`: M1 target capability profile completed read-only.
+- `INCIDENT_EVIDENCE_READY`: at least one target incident can be reconstructed with explicit gaps/provenance.
+- `BUILD_READY`: Android project/toolchain locked from real environment and clean build/test succeeds.
+- `DEVICE_TEST_READY`: APK installs/launches on target and no-write/observer-budget tests pass.
+- `DAILY_USE_READY`: M3 stability/privacy/retention/overhead criteria pass across representative workload.
+- `ACTUATOR_CANARY_READY`: exactly one actuator satisfies qualification/rollback + target causal evidence.
+- `PRODUCTION_ACTUATOR_READY`: repeated benefit and safety evidence supports bounded production use on exact device/firmware class.
 
-## IMPLEMENTATION_READY
-Architecture-ready **plus** M1 target capability evidence sufficient to select exact Android sensor/API set; Android module/interface plan has no unknown transition that would force architecture invention; toolchain bootstrap chosen. **Current: false — target evidence/toolchain not yet fixed.**
-
-## BUILD_READY
-Implementation-ready **plus** Android project/wrapper committed; exact JDK/SDK/AGP/Gradle locked and clean host/CI build succeeds; secrets/signing boundary documented. **Current: false.**
-
-## DEVICE_TEST_READY
-Build-ready **plus** installable debug APK produced; safe test data/workload and rollback/no-write expectations defined; target device access available. **Current: false.**
-
-## DAILY_USE_READY
-Target tests show acceptable crash-free operation, observer overhead within device-derived budget, state migration/firmware invalidation/recovery working, privacy/export behavior validated, and no unresolved critical/high safety defect. Privileged write actuators are optional. **Current: false.**
-
-## RELEASE_READY
-Daily-use-ready **plus** release build reproducible, release signing process configured outside repo, upgrade/rollback path tested, release notes/known limitations complete, target compatibility statement evidence-backed. **Current: false.**
-
-Completeness labels are orthogonal: this package can be `FULLY_SPECIFIED` while software remains `PARTIALLY_IMPLEMENTED` and target behavior `BLOCKED_BY_DEVICE_EVIDENCE`.
+Knowledge-package completion never implies Android build/device readiness.
