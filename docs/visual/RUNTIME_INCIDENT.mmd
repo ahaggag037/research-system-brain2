@@ -1,0 +1,25 @@
+sequenceDiagram
+  participant P as CMP-005 Policy
+  participant G as CMP-006 Privilege Gateway
+  participant A as Qualified Actuator
+  participant O as CMP-003 Observer
+  participant S as CMP-008 Store
+  P->>G: typed CandidateAction
+  G->>G: verify exact profile + qualification + exclusions
+  alt not qualified / unsafe / uncertain
+    G-->>P: REJECT / NO_OP
+  else qualified
+    G->>G: capture SafetySnapshot + journal
+    G->>A: apply bounded operation
+    A-->>G: read-back
+    G->>O: canary observation
+    alt postcondition and health pass
+      G->>S: outcome evidence
+      G-->>P: VERIFIED_SUCCESS
+    else failure / controller fight / regression
+      G->>A: rollback
+      A-->>G: rollback read-back
+      G->>S: failure + suspension evidence
+      G-->>P: ROLLED_BACK / CRITICAL_FAULT if unresolved
+    end
+  end

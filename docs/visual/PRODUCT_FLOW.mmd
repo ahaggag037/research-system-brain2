@@ -1,0 +1,20 @@
+stateDiagram-v2
+  [*] --> Home
+  Home --> Diagnose: Diagnose a problem
+  Diagnose --> Capturing: Start read-only session
+  Capturing --> Report: Mark incident / finish
+  Report --> Unknown: insufficient/conflicting evidence
+  Report --> Guidance: documented Huawei policy likely
+  Report --> Evidence: resource/thermal/I/O evidence available
+  Unknown --> Diagnose: collect missing evidence
+  Guidance --> Verify: user changes documented setting
+  Verify --> Report: repeat observation
+  Evidence --> Shadow: future policy evaluates candidate
+  Shadow --> NoOp: not qualified / low expected value
+  Shadow --> SafetyReview: qualified candidate exists
+  SafetyReview --> Applied: explicit future typed canary
+  SafetyReview --> NoOp: safety/rollback gate fails
+  Applied --> Recovered: regression/failure -> rollback
+  Applied --> Report: verified outcome
+  Recovered --> Report
+  NoOp --> Report

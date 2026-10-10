@@ -1,0 +1,27 @@
+flowchart LR
+  U["V-UI / CMP-001\nApp + Session UI"] --> CAP["V-CAP / CMP-002\nCapability Scanner"]
+  U --> OBS["V-OBS / CMP-003\nFlight Recorder"]
+  CAP --> OBS
+  OBS --> EST["V-EST / CMP-004\nState Estimator"]
+  EST --> POL["V-POL / CMP-005\nShadow Policy"]
+  POL -->|NO_OP / guidance| U
+  POL --> PRIV["V-PRIV / CMP-006\nTyped Privilege Gateway"]
+  U --> HUA["V-HUA / CMP-007\nHuawei Assistant"]
+  CAP --> STORE["V-STORE / CMP-008\nEvidence Store"]
+  OBS --> STORE
+  EST --> STORE
+  POL --> STORE
+  PRIV --> STORE
+  HUA --> STORE
+  STORE --> REP["V-REP / CMP-009\nReport / Redacted Export"]
+  REP --> U
+  STORE -. shadow data .-> CONT["V-CONT / CMP-010\nContinuity Allocator\nEXPERIMENTAL"]
+  CONT -. candidate only .-> POL
+  subgraph P["Privileged boundary"]
+    PRIV
+  end
+  SYS[("Android / Huawei\nplatform controllers")]
+  CAP -->|read probes| SYS
+  OBS -->|read observations| SYS
+  PRIV -->|qualified typed write only| SYS
+  HUA -->|documented settings guidance| SYS
