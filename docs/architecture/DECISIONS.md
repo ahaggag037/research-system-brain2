@@ -1,53 +1,89 @@
 # Architecture Decision Records
 
-## ADR-001 — Select evidence-gated supervisor
-**Status:** ACTIVE  
-**Context:** Similar Huawei/Android symptoms can originate from multiple resource and policy mechanisms.  
-**Alternatives:** static tweak pack; aggressive root autotuner; diagnostics-only; evidence-gated supervisor.  
-**Choice:** FH-A1 evidence-gated supervisor.  
-**Evidence:** AOSP LMKD/PSI/cgroup/freezer/thermal docs and Huawei background-policy docs in `docs/evidence/SOURCES.md`.  
-**Assumptions:** useful observables exist on the target, at least via explicit shell/root read access.  
-**Consequences:** diagnosis and shadow evaluation precede writes; architecture remains useful even if zero write actuators qualify.  
-**Risks:** observer overhead; classification uncertainty; controller conflict.  
-**Reopen if:** target evidence shows observability is too weak or a simpler architecture achieves the same outcomes.  
+## Historical FH-A1 decisions
 
-## ADR-002 — First useful build is observation-first
-**Status:** ACTIVE  
-**Choice:** ship/use a read-only capability/pressure snapshot path before Android privileged control.  
-**Why:** it produces high information gain, validates assumptions, and cannot destabilize system policy through writes.  
-**Reopen if:** the target denies enough observability that the snapshot is not decision-useful.
+### ADR-001 — Select evidence-gated supervisor
+**Status:** SUPERSEDED_BY_ADR-009  
+FH-A1 was selected in V10.3-B. Arm B external research retained its evidence-gating invariant but superseded its observation/state-estimator-centered topology. Historical rationale remains in Git history and `ARCHITECTURE_REEVALUATION_ARM_B.md`.
 
-## ADR-003 — Multi-signal state estimation; UNKNOWN is allowed
-**Status:** ACTIVE  
-**Choice:** no single free-RAM, PSI, clock or thermal threshold may authorize control. Estimation combines available evidence and emits `UNKNOWN_OR_MIXED` when evidence conflicts or is incomplete.  
-**Evidence:** AOSP 2026 LMKD correction shows a full-memory-PSI signal can be misleading under some memcg conditions.  
-**Reopen if:** validated target telemetry establishes a stronger causal minimal signal set.
+### ADR-002 — First useful build is observation-first
+**Status:** REVISED_BY_ADR-010  
+Read-only capability discovery remains correct; “observation-first” is now refined to **incident/direct-history first, minimum evidence escalation second**.
 
-## ADR-004 — Typed privilege gateway; no arbitrary root endpoint
-**Status:** ACTIVE  
-**Choice:** UI/policy code cannot execute free-form root commands. Privileged writes, if ever admitted, are allowlisted typed actuators with preconditions, bounded parameters, verification, timeout and rollback.  
-**Reopen if:** never for unrestricted root; typed implementation details may evolve.
+### ADR-003 — Multi-signal state estimation; UNKNOWN is allowed
+**Status:** REVISED_BY_ADR-011  
+UNKNOWN remains active, but direct version-qualified platform incident records outrank generic multi-signal inference.
 
-## ADR-005 — No persistent boot-time modifications in first installable build
-**Status:** ACTIVE  
-**Choice:** first Android build is observation/reporting only; any privileged read helper is explicit-session and ephemeral.  
-**Why:** firmware/device capability is unverified and persistent services add reliability/battery risk.  
-**Reopen if:** daily-use evidence demonstrates a persistent observer is required and overhead/recovery tests pass.
+### ADR-004 — Typed privilege gateway; no arbitrary root endpoint
+**Status:** ACTIVE / RETAINED  
+No evidence justified weakening this boundary.
 
-## ADR-006 — Huawei documented settings before undocumented mutation
-**Status:** ACTIVE  
-**Choice:** diagnose App Launch/background/battery policy and guide the user through documented settings/deep links where possible; do not edit undocumented vendor state stores.  
-**Reopen if:** Huawei exposes a documented programmable API suitable for the target.
+### ADR-005 — No persistent boot-time modifications in first installable build
+**Status:** ACTIVE / STRENGTHENED_BY_ADR-010  
+Android freezer/background restrictions and observer self-interference further reduce the case for an always-on privileged daemon in M2.
 
-## ADR-007 — Continuity allocator is experimental, non-destructive initially
-**Status:** ACTIVE  
-**Choice:** user-priority/reuse/cold-start-cost scoring may rank continuity value in shadow mode, but initial production does not kill/freeze arbitrary apps based on this score.  
-**Reopen if:** E-003/E-005-style device experiments show safe, superior outcomes and protect background semantics.
+### ADR-006 — Huawei documented settings before undocumented mutation
+**Status:** SUPERSEDED_BY_ADR-012  
+The safety principle survives; the component is generalized to Android + vendor/version policy adapters.
 
-## ADR-008 — Local-first evidence and redacted export
-**Status:** ACTIVE  
-**Choice:** sensitive device/app telemetry stays local by default; exports minimize fields and support identifier redaction. Public repository must never receive raw device reports automatically.  
-**Reopen if:** user explicitly configures another privacy-preserving storage model.
+### ADR-007 — Continuity allocator is experimental, non-destructive initially
+**Status:** REVISED_BY_ADR-014  
+The module remains experimental but is narrowed away from page-hotness/reclaim duplication toward user value and relaunch outcomes.
 
-## Rejected major alternatives
-See `docs/evidence/REJECTED_IDEAS.md`; history is preserved rather than rewritten.
+### ADR-008 — Local-first evidence and redacted export
+**Status:** ACTIVE / RETAINED  
+Arm B produced no reason to externalize raw cross-app telemetry.
+
+## Active FH-A2 decisions
+
+### ADR-009 — Select FH-A2 Incident-Centric Evidence Escalation Supervisor
+**Status:** ACTIVE  
+**Question:** Does FH-A1 remain the strongest design after mandatory current external research?  
+**Evidence:** S-017..S-044 and `EXTERNAL_RESEARCH_EXPANSION_ARM_B.md`.  
+**Decision:** Select FH-A2. Start from incidents/direct platform records, then escalate evidence only as needed. Preserve evidence gating, typed privilege and target qualification.  
+**Why:** Android now exposes distinct MemoryLimiter/freezer/background-policy/start/exit mechanisms; continuous app-level observation is lifecycle-constrained.  
+**Rejected:** preserving FH-A1 for sunk-cost reasons; diagnostics-only as end state; second OOM killer; custom kernel architecture as stock-device product.  
+**Reopen if:** M1 shows direct incident evidence is unusable and continuous privileged telemetry is both necessary and low-risk, or another simpler architecture demonstrates equal diagnostic/control value.
+
+### ADR-010 — Tiered incident capture replaces continuous Flight Recorder as default
+**Status:** ACTIVE  
+**Evidence:** S-022..S-026, S-044.  
+**Decision:** Tier 0 platform history → Tier 1 cheap snapshot → Tier 2 triggered Perfetto → Tier 3 explicit privileged reads. Persistent foreground/privileged monitoring is not default.  
+**Consequence:** A2-004 owns escalation and observer budget. Deep tracing must be bounded and justified.
+
+### ADR-011 — Direct version-qualified incident evidence outranks generic state inference
+**Status:** ACTIVE  
+**Evidence:** S-017..S-021, S-043.  
+**Decision:** A2-003 first uses reliable direct exit/start/limiter/freezer/policy evidence. Multi-signal PSI/memory/thermal inference is fallback/context.  
+**Important caveat:** `ApplicationExitInfo` reason support and cross-UID history vary; absence never proves the event did not occur. Description strings are not stable machine contracts.  
+**Consequence:** cause records carry source, version, access method and confidence.
+
+### ADR-012 — Generalize Huawei Assistant to versioned Platform Policy Adapter
+**Status:** ACTIVE  
+**Evidence:** S-024, S-025, S-031..S-034.  
+**Decision:** A2-007 models Android baseline Doze/standby/background limits and vendor/version adapters, starting with Huawei EMUI/HarmonyOS documented controls.  
+**Consequence:** no undocumented vendor DB mutation; PerfGenius is treated as app-scoped capability, not a global optimizer.
+
+### ADR-013 — Experiments promote outcomes, not proxy metrics
+**Status:** ACTIVE  
+**Evidence:** S-036, S-037, S-043.  
+**Decision:** A2-005 uses paired/repeated physical-device trials where practical, thermal/control-condition annotation, and user outcomes (cold/warm/hot, relaunch latency/continuity, recurrence).  
+**Consequence:** free RAM, clocks or one PSI sample cannot establish benefit.
+
+### ADR-014 — Continuity research uses relaunch/user value; kernel hotness stays kernel-owned
+**Status:** ACTIVE  
+**Evidence:** S-027, S-038..S-041.  
+**Decision:** A2-009 may learn user-priority/relaunch-distance/cost rankings in shadow mode; it does not duplicate page-hotness/reclaim policy. Kernel/framework innovations are a separate future custom-system research track.  
+**Consequence:** no arbitrary killing/freezing from learned rankings in stock production.
+
+### ADR-015 — Observer self-interference is a first-class safety constraint
+**Status:** ACTIVE  
+**Evidence:** S-021, S-036, S-044.  
+**Decision:** every capture mode declares/records expected overhead; optional probes are shed under observer stress. A supported app memory budget may be experimentally used only after a measured safe baseline.  
+**Consequence:** measurement quality includes cost-of-measurement evidence.
+
+### ADR-016 — Merge evidence store and report/export boundary
+**Status:** ACTIVE  
+**Reason:** FH-A1 CMP-008 and CMP-009 shared one provenance/privacy lifecycle; a separate report component did not earn unique concurrency/privilege/recovery ownership.  
+**Decision:** A2-008 owns versioned evidence persistence plus redacted reporting/export.  
+**Consequence:** one less production component while preserving export/redaction tests.

@@ -1,51 +1,47 @@
-# Interfaces, Runtime Flows, Startup/Shutdown
+# FH-A2 Interfaces, Runtime and Lifecycle
 
-## Interface map
-| Interface | Caller → Callee | Data | Mode | Timeout/retry | Failure propagation | Privilege / rollback |
-|---|---|---|---|---|---|---|
-| IF-001 CapabilityScan | CMP-001 → CMP-002 | ScanRequest → DeviceProfile | async/cancellable | per-probe timeout; no blind retry storm | partial UNKNOWN profile | optional read session; no writes |
-| IF-002 Observe | CMP-001/CMP-004 → CMP-003 | CapturePolicy → samples/window | async stream | bounded capture; optional probe backoff | gaps annotated | read-only |
-| IF-003 Estimate | CMP-003 → CMP-004 | evidence bundle → StateEstimate | sync/pure or worker | no retry needed | UNKNOWN result | none |
-| IF-004 Decide | CMP-004 → CMP-005 | StateEstimate + policy → candidate | sync/pure | no retry | NO_OP | none |
-| IF-005 Actuate | CMP-005 → CMP-006 | typed CandidateAction | async serialized | hard deadline, no generic repeat | fault + rollback result | privileged; actuator rollback mandatory |
-| IF-006 SettingsGuide | CMP-001 → CMP-007 | model/OS/symptom | async | bounded | generic UNKNOWN guidance | no undocumented writes |
-| IF-007 Persist | all → CMP-008 | versioned records | async transactional | bounded storage retry | degraded in-memory status | no privilege |
-| IF-008 Export | CMP-001 → CMP-009 | report request | async | user retry | no source mutation | redact/share boundary |
+## Interface table
+| ID | From → To | Payload | Runtime semantics | Failure semantics | Privilege/safety |
+|---|---|---|---|---|---|
+| IF2-001 Profile | A2-002 → all | `DeviceProfile` | refresh on firmware/capability invalidation | partial UNKNOWN allowed | discovery read-only |
+| IF2-002 Incident | A2-001 → A2-003 | symptom marker/context | timestamped explicit session | no evidence → request gap | APP |
+| IF2-003 Direct evidence | platform/adapters → A2-003 | exit/start/policy records + provenance | query on incident/session | unsupported/denied distinct | access tagged |
+| IF2-004 Evidence gap | A2-003 → A2-004 | needed evidence family + reason | minimum-tier selection | cannot satisfy → gap remains | no auto privilege |
+| IF2-005 Capture bundle | A2-004 → A2-003/A2-008 | bounded evidence + observer cost | cancellable, time-bounded | partial bundle valid | tier-specific |
+| IF2-006 Attribution | A2-003 → A2-001/A2-005 | cause/confidence/evidence/gaps | replayable | UNKNOWN valid | none |
+| IF2-007 Policy assessment | A2-007 → A2-003/A2-001 | versioned policy facts/guidance | on demand/version refresh | unknown version | no undocumented write |
+| IF2-008 Experiment | A2-005 ↔ A2-008 | protocol/trials/outcomes | paired/repeated where feasible | inconclusive preserved | none |
+| IF2-009 Candidate action | A2-005 → A2-006 | typed qualified request | serialized transaction | reject/no-op | privileged boundary |
+| IF2-010 Evidence/report | all ↔ A2-008 | versioned records/export | transactional | quarantine corruption | private-by-default |
 
-Interfaces are schema-versioned. A breaking schema change requires state migration + documentation + tests in the same change.
+## Incident runtime — primary path
+1. User observes a reload/exit/jank/background-continuity failure and opens/marks an incident in A2-001.
+2. A2-002 validates DeviceProfile freshness.
+3. A2-003 queries the highest-value direct records that are actually accessible: process exit/start reason/type/timestamps, limiter/freezer/policy facts.
+4. A2-003 creates an initial attribution. If evidence is sufficient, no continuous capture is needed.
+5. If a material gap remains, A2-004 selects the lowest adequate tier: T1 cheap snapshot, T2 triggered trace, or T3 explicit privileged read session.
+6. A2-003 recomputes attribution and records direct/context/contradicting evidence separately.
+7. A2-007 contributes Android/vendor policy assessment when the symptom could be policy-limited.
+8. A2-008 persists the incident locally; A2-001 shows cause/confidence/gaps and safe next action.
+9. A2-005 may define a shadow experiment. Initial product normally returns NO_OP, guidance or a measurement task.
 
-## Normal runtime trace — symptom investigation
-1. User opens CMP-001 and selects **Diagnose**.
-2. CMP-002 loads or refreshes DeviceProfile if firmware fingerprint changed.
-3. CMP-003 starts low-cost sampling and an incident ring buffer.
-4. User reproduces slow resume/jank and marks the incident.
-5. CMP-003 freezes a bounded evidence window; if allowed and useful, it can request a short Perfetto/deep capture.
-6. CMP-004 returns a StateEstimate with evidence/missing evidence.
-7. CMP-005 evaluates candidate responses. Initial builds normally return `NO_OP`, additional capture, or CMP-007 settings guidance.
-8. CMP-008 stores the evidence and provenance locally.
-9. CMP-001 displays explanation, confidence, unknowns and next safe action.
-10. Optional CMP-009 export shows a redaction preview before writing a shareable bundle.
+## Qualified-actuator path
+Unchanged safety shape from FH-A1, but attribution/experiment evidence is now incident-linked:
+`qualified candidate → profile/firmware recheck → safety snapshot → one typed operation → read-back → paired/canary outcome window → commit evidence OR rollback/suspend`.
 
-## Future qualified-actuator trace
-1. CMP-005 proposes a **typed** action already qualified for the exact DeviceProfile.
-2. CMP-006 rechecks firmware fingerprint, operating-region exclusions and qualification freshness.
-3. Gateway captures pre-state/rollback material.
-4. Gateway performs one bounded actuation.
-5. Gateway reads back/verifies control state and CMP-003 observes outcome during a canary window.
-6. Any failed postcondition, controller fight or safety regression triggers immediate rollback and qualification revocation/suspension.
-7. CMP-008 records before/after/rollback evidence; UI shows result.
+## Evidence escalation semantics
+- **T0:** after-the-fact OS/app history, no daemon requirement.
+- **T1:** bounded M0/M1 snapshot; read-only and user-writable output only.
+- **T2:** privileged preconfiguration may be needed; unprivileged app can only signal predeclared Perfetto triggers where supported. Never assume trigger support from Android version alone.
+- **T3:** explicit temporary shell/root-read session; release after session.
 
-## Startup lifecycle
-- App process starts in ordinary privilege.
-- Validate local schema/migrations; corruption enters degraded/read-only recovery.
-- Load DeviceProfile; if build/firmware fingerprint differs, mark capabilities stale and require rescan before any privileged operation.
-- Start only low-cost observers explicitly enabled by user/app lifecycle.
-- Privileged helper is **not** boot-persistent in the first installable build; it is acquired for explicit sessions and released afterward.
-- Policy engine starts with write capability disabled unless every qualification precondition is current.
+## Lifecycle implications
+- App start validates/migrates local state and loads DeviceProfile.
+- No first-build boot-persistent helper or permanent FGS is required.
+- If FixHUA itself becomes cached/frozen/background-restricted, no correctness claim depends on uninterrupted polling.
+- Firmware/full-SDK/vendor-policy changes stale affected capabilities and all write qualifications.
+- Reboot terminates ephemeral sessions and pending capture assumptions; next run re-profiles.
+- A2-006 transaction journal/timeout owns rollback independently of UI lifetime for any future writes.
 
-## Shutdown / crash / update
-- Graceful shutdown ends captures, flushes transactional records, and releases an ephemeral privileged session.
-- App crash must not leave a write transaction pending; CMP-006 transaction design owns rollback/timeout independent of UI lifecycle.
-- Reboot invalidates active sessions and ephemeral rollback assumptions; next start re-scans capabilities before writes.
-- App/firmware update runs schema migration; firmware change invalidates write qualifications until requalification.
-- No automatic boot-time tuning is part of the first daily build.
+## Version-aware direct-record rule
+A2-003 must bind parsers to documented API/feature versions. Example: current `REASON_MEMORY_LIMITER` is a version 37.2 API surface, while older Android 17 behavior may expose description/command behavior differently. Human-readable descriptions are evidence for display/debugging, not stable universal parser keys unless a version-specific adapter explicitly qualifies them.

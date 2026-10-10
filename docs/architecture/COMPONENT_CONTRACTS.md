@@ -1,110 +1,90 @@
-# Component Contracts
+# FH-A2 Component Contracts
 
-All IDs are stable. Performance numbers are `UNKNOWN` until E-002 establishes target budgets.
+Stable active IDs use `A2-xxx`. Historical `CMP-xxx` IDs remain in prior V10.3-B artifacts/Git history and must not be silently reinterpreted.
 
-## CMP-001 — App/UI + Session Coordinator
-- **Purpose:** render current state/evidence, start/stop explicit diagnostic sessions, collect user symptom context, show recovery/errors.
-- **Inputs:** DeviceProfile, StateEstimate, IncidentReport, SettingsAssessment, Experiment status.
-- **Outputs:** session lifecycle events, user-approved capture/export/settings-navigation requests.
-- **Preconditions:** local state schema valid; no implicit privilege grant.
-- **Postconditions:** every user-visible action has an audit event and visible state.
-- **Invariants:** UI never issues raw privileged commands; no claim stronger than backing truth state.
-- **Side effects:** local config/audit writes only.
-- **Failure/recovery:** degrade to read-only status; preserve last known safe state; never retry privileged work invisibly.
-- **Concurrency:** UI thread for rendering; long work async/cancellable.
-- **Privilege:** ordinary app.
-- **Must not:** hide UNKNOWN, auto-enable write actuators, or upload raw telemetry.
-- **Tests:** T-UI-01 state rendering, T-UI-02 error/recovery state, T-PRIV-01 boundary.
+## A2-001 — Incident Session Coordinator
+- **Purpose:** user-facing diagnose session, incident marker/intake, evidence/confidence/recovery UI.
+- **Inputs:** DeviceProfile, IncidentAttribution, CaptureRequest/Status, PlatformPolicyAssessment, Experiment status.
+- **Outputs:** explicit diagnose/capture/export/settings-navigation requests and user symptom context.
+- **Invariants:** never hides UNKNOWN; UI cannot issue raw privileged commands; no automatic background privilege acquisition.
+- **Failure:** degrade to existing local evidence/read-only status.
+- **Privilege:** APP only.
+- **Tests:** UI state matrix, cancellation/recovery, privilege-boundary test.
 
-## CMP-002 — Capability Scanner
-- **Purpose:** discover what the current device/firmware actually exposes before other components assume it.
-- **Inputs:** OS/build metadata, safe filesystem/API probes, optional explicit shell/root read capability.
-- **Outputs:** versioned `DeviceProfile` with supported/unsupported/unknown capabilities and provenance.
-- **Preconditions:** read-only probe list; bounded timeout.
-- **Postconditions:** no system setting changed.
-- **Invariants:** absent/denied != false support claim; distinguish unsupported from unobservable.
-- **Failure/recovery:** partial profile accepted with UNKNOWN fields; scanner failure cannot trigger actuation.
-- **Concurrency:** serial or bounded parallel read probes.
-- **Privilege:** ordinary + optional explicit read session.
-- **Must not:** hard-code unobserved vendor nodes as facts.
-- **Tests:** T-CAP-01 parser fixtures, T-CAP-02 denied capability, T-CAP-03 no-write audit.
+## A2-002 — Capability & Platform Profiler
+- **Purpose:** establish what the exact build can observe/control before dependent logic assumes it.
+- **Inputs:** OS/build metadata; safe APIs/files; optional explicit shell/root-read session.
+- **Outputs:** versioned `DeviceProfile` with status + access + evidence provenance.
+- **Mandatory capability families:** Android API/full-SDK; low-memory exit reporting; ApplicationStartInfo; MemoryLimiter; app-memory-budget API; cached freezer; PSI; cgroup v2/task profiles; MGLRU; DAMON; Perfetto trigger feasibility; thermal headroom; vendor-policy version.
+- **Invariants:** distinguish `UNSUPPORTED`, `UNOBSERVABLE`, `UNKNOWN`; denied != absent; no system write during discovery.
+- **Failure:** partial profile allowed; dependent cause/action becomes UNKNOWN/disabled.
+- **Privilege:** APP, optional SHELL_READ/ROOT_READ.
+- **Tests:** fixture/version matrix; denied access; no-write audit.
 
-## CMP-003 — Flight Recorder
-- **Purpose:** capture low-overhead system evidence and bounded incident windows.
-- **Inputs:** DeviceProfile, sampling config, incident triggers.
-- **Outputs:** ObservationSample stream, IncidentWindow, capture-health metrics.
-- **Invariants:** two-speed collection; expensive traces are bounded; overhead metrics accompany evidence.
-- **Failure/recovery:** drop optional probes first, mark gaps, keep UI usable; ring-buffer corruption resets only recorder state.
-- **Concurrency:** single writer per data stream; timestamps monotonic where available.
-- **Privilege:** ordinary; optional read session for privileged observables.
-- **Must not:** continuously run high-overhead Perfetto by default.
-- **Tests:** T-OBS-01 sampling, T-OBS-02 overhead budget, T-OBS-03 missing-probe degradation.
+## A2-003 — Incident Evidence Engine
+- **Purpose:** build a time-aligned incident record and attribute the strongest supported causal class.
+- **Inputs:** direct exit/start records, DeviceProfile, bounded capture evidence, policy assessment, symptom context.
+- **Outputs:** `IncidentAttribution {cause, confidence, directEvidence[], contextualEvidence[], contradictingEvidence[], gaps[]}`.
+- **Evidence rule:** reliable direct version-qualified platform reason outranks generic pressure heuristics; conflicts lower confidence.
+- **Invariants:** never parse unstable human description text as a universal semantic contract; no single heuristic authorizes a write; UNKNOWN valid.
+- **Failure:** incomplete/ambiguous evidence → `UNKNOWN_OR_MIXED` with requested evidence gap.
+- **Privilege:** none itself; consumes evidence with provenance.
+- **Tests:** direct-reason fixtures, unsupported-low-memory-report fixture, conflict fixture, exit→start correlation fixture.
 
-## CMP-004 — State Estimator
-- **Purpose:** explain which operating region best fits current evidence.
-- **Inputs:** DeviceProfile + ObservationSample/IncidentWindow + optional symptom context.
-- **Outputs:** `StateEstimate {state, confidence, evidence_for, evidence_against, missing_evidence}`.
-- **Invariants:** one signal cannot authorize action; contradictions lower confidence; UNKNOWN is valid.
-- **Failure/recovery:** invalid/incomplete input → UNKNOWN with reason.
-- **Concurrency:** pure/replayable computation where possible.
+## A2-004 — Tiered Capture Orchestrator
+- **Purpose:** obtain the minimum additional evidence needed for an incident.
+- **Tiers:** T0 platform history; T1 cheap snapshot; T2 bounded triggered Perfetto; T3 explicit privileged read session.
+- **Inputs:** evidence gaps, DeviceProfile, ObserverBudget, user approval for higher-cost/private capture.
+- **Outputs:** bounded evidence bundle + capture-health/overhead record.
+- **Invariants:** no continuous deep tracing by default; high-cost capture time-bounded; privacy and observer cost recorded.
+- **Failure:** downgrade tier/mark gap; never “retry until it works” invisibly.
+- **Privilege:** APP → optional SHELL_READ/ROOT_READ according to tier.
+- **Tests:** minimum-tier selection, timeout/cancel, unsupported Perfetto, overhead shedding.
+
+## A2-005 — Experiment & Shadow Evaluator
+- **Purpose:** test whether guidance/policies/actions improve outcomes before promotion.
+- **Inputs:** IncidentAttribution, DeviceProfile, candidate, user workflow, thermal/control conditions, historical experiments.
+- **Outputs:** `NO_OP`, guidance, more-evidence request, or typed `CandidateAction` marked SHADOW/CANARY eligibility.
+- **Invariants:** paired/repeated trials where feasible; user outcome over proxy; hysteresis/cooldown; one experimental actuator at a time.
+- **Failure:** experiment uncertainty/regression → no promotion; preserve negative evidence.
 - **Privilege:** none.
-- **Must not:** claim causality from correlation without experiment evidence.
-- **Tests:** T-EST-01..05 fixture classes, T-EST-06 conflict→UNKNOWN.
+- **Tests:** no-op default, pairing/repetition, confound detection, regression gate.
 
-## CMP-005 — Shadow Policy Engine
-- **Purpose:** map state/evidence/user intent to candidate actions without direct privilege.
-- **Inputs:** StateEstimate, DeviceProfile, ActuatorQualification records, user policy.
-- **Outputs:** `NO_OP`, guidance, capture request, or typed CandidateAction.
-- **Invariants:** default deny; no unqualified write action; one experimental actuator at a time; hysteresis/dwell/cooldown around stateful actions.
-- **Failure/recovery:** engine error → NO_OP + report.
-- **Privilege:** none.
-- **Must not:** execute commands itself.
-- **Tests:** T-POL-01 default no-op, T-POL-02 qualification gate, T-POL-03 cooldown.
+## A2-006 — Typed Privilege Gateway
+- **Purpose:** isolate privileged reads/writes behind allowlisted typed contracts.
+- **Write preconditions:** exact observed control + ownership semantics sufficient + device/firmware qualification + bounded parameters + baseline + abort + read-back + rollback + same-device canary evidence.
+- **Outputs:** operation result, verification, rollback result and audit record.
+- **Invariants:** no arbitrary command endpoint; one write transaction; deadlines; fail closed.
+- **Failure:** rollback; unresolved rollback disables all writes and raises critical fault.
+- **Privilege:** SHELL/ROOT only when explicitly acquired.
+- **Must not:** disable hardware/thermal safety, verified boot/integrity, DRM/account/banking/security protections.
+- **Tests:** type-boundary injection, stale qualification, partial failure rollback.
 
-## CMP-006 — Typed Privilege Gateway
-- **Purpose:** isolate privileged observation/actuation behind allowlisted typed contracts.
-- **Inputs:** typed request, DeviceProfile, qualification record, safety snapshot.
-- **Outputs:** result + verification + rollback result + audit event.
-- **Preconditions for writes:** observed control, approved qualification, exact device/firmware match, safe operating region, rollback captured.
-- **Postconditions:** either verified requested state or verified rollback/degraded-safe result.
-- **Invariants:** no raw command surface to UI/network; time-bounded; one actuator transaction at a time.
-- **Failure/recovery:** partial/failure immediately invokes actuator-specific rollback; unresolved rollback marks critical fault and disables all writes.
-- **Privilege:** shell/root only when explicitly acquired.
-- **Must not:** disable thermal/hardware safety or bypass platform/app integrity/security.
-- **Tests:** T-PRIV-01 command-surface denial, T-PRIV-02 precondition gate, T-PRIV-03 rollback injection.
+## A2-007 — Platform Policy Adapter
+- **Purpose:** explain OS/vendor policy restrictions separately from memory-pressure causes.
+- **Adapters:** Android baseline (Doze/App Standby/background/job restrictions, MemoryLimiter capability metadata) + Huawei EMUI/HarmonyOS documented policy guidance; additional adapters can be added only with evidence.
+- **Inputs:** DeviceProfile, policy observables, documented version map, user-confirmed setting state where APIs cannot read it.
+- **Outputs:** `PlatformPolicyAssessment` with source/version/confidence and safe navigation guidance.
+- **Invariants:** no invented UI path; no undocumented vendor-store edits; app-scoped vendor SDK != global control.
+- **Failure:** unknown version → generic/UNKNOWN guidance.
+- **Privilege:** APP; read-only shell when explicitly available.
+- **Tests:** version maps, unknown fallback, no-undocumented-write audit.
 
-## CMP-007 — Huawei Compatibility Assistant
-- **Purpose:** distinguish/document common Huawei background-policy restrictions and guide safe user changes.
-- **Inputs:** model/OS family, symptom context, observable settings/intents where documented.
-- **Outputs:** SettingsAssessment + version-qualified guidance/deep links.
-- **Invariants:** programmatic mutation only if a documented supported API exists; otherwise human-confirmed settings guidance.
-- **Failure/recovery:** unknown UI/version → generic vendor guidance marked UNKNOWN, not invented paths.
-- **Privilege:** ordinary.
-- **Tests:** T-HUA-01 version mapping, T-HUA-02 unknown-version fallback.
+## A2-008 — Evidence Store & Redacted Reporting
+- **Purpose:** persist provenance-bearing profiles/incidents/experiments/qualifications and produce human/redacted machine reports.
+- **Invariants:** schema migrations; local/private raw cross-app evidence; retention controls; qualification tied to device/firmware; export preview/redaction.
+- **Failure:** transactional write; corrupt records quarantined; never infer qualification from partial state.
+- **Privilege:** APP.
+- **Tests:** migration, corruption recovery, redaction, export schema.
 
-## CMP-008 — Experiment & Evidence Store
-- **Purpose:** persist versioned profiles, experiments, qualification and audit provenance.
-- **Inputs:** records from scanner/recorder/estimator/policy/gateway.
-- **Outputs:** queryable local evidence, replay inputs, qualification history.
-- **Invariants:** migrations versioned; raw sensitive exports opt-in; qualification tied to device/firmware fingerprint.
-- **Failure/recovery:** transactional writes; corruption → quarantine + rebuild from safe configuration, never infer qualification.
-- **Privilege:** ordinary.
-- **Tests:** T-STATE-01 migration, T-STATE-02 corruption recovery.
+## A2-009 — Continuity Research Module (experimental)
+- **Purpose:** estimate continuity value for user-designated workflows in shadow mode.
+- **Inputs:** explicit user priority, relaunch distance/history where lawful, cold-start/relaunch cost, footprint, background semantic role.
+- **Outputs:** explanation/ranking + experiment hypotheses only.
+- **Invariants:** no page-hotness imitation; no “pin everything”; no direct kill/freeze action from prediction; calibrated fallback for insufficient history.
+- **Failure:** insufficient generalization/confidence → no ranking/action.
+- **Privilege:** none in stock-device form.
+- **Tests:** calibration/fallback, explanation stability, background-role protection, out-of-distribution no-op.
 
-## CMP-009 — Report / Redacted Export
-- **Purpose:** create human-readable diagnosis and privacy-reduced machine bundle.
-- **Inputs:** DeviceProfile, IncidentWindow, StateEstimate, audit record.
-- **Outputs:** local report/export.
-- **Invariants:** export preview; no secrets; package/activity identifiers redacted by default for sharing.
-- **Failure/recovery:** failed export leaves source store intact.
-- **Privilege:** ordinary.
-- **Tests:** T-EXP-01 redaction, T-EXP-02 schema.
-
-## CMP-010 — Continuity Allocator (experimental)
-- **Purpose:** estimate relative continuity value for user-designated workloads; initially shadow-only.
-- **Inputs:** explicit user priority, recency/reuse observations, cold-start cost, footprint/background-role signals where lawful/observable.
-- **Outputs:** explanation/ranking; no initial destructive action.
-- **Invariants:** user intent dominates; no “pin everything”; no freezer-as-memory-relief assumption.
-- **Failure/recovery:** insufficient evidence → no ranking/action.
-- **Privilege:** none in initial form.
-- **Tests:** T-CONT-01 explanation stability, T-CONT-02 background-role protection.
+## Cross-cutting Observer Budget
+Every evidence source declares expected cost class, sampling/capture duration, privacy class, and failure behavior. Runtime records actual cost where measurable. Optional sources are shed before diagnostic instrumentation becomes a material source of jank, memory pressure, heat or battery drain.
