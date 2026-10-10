@@ -1,16 +1,16 @@
 # ACTIVE NOTES
 
-> Noncanonical operational scratch. Canonical truth is in `PROJECT_STATE.json`, `docs/**`, `FINAL_AUDIT.md`, and `HANDOFF_CHECKPOINT.md`.
+> Noncanonical operational scratch. Canonical truth is `PROJECT_STATE.json` + `docs/**`.
 
-## Final-session facts
-- Selected architecture: FH-A1 Evidence-Gated Adaptive Supervisor.
-- M0 read-only probe + host analyzer are implemented; host suite is 6/6 PASS.
-- Android APK and privileged write actuators are not implemented.
-- F-001 portable TSV manifest parsing defect was found, repaired, and regression-tested.
-- GitHub-only cold-start via authenticated connector PASS.
-- Direct `git clone` from the execution container failed because DNS could not resolve github.com; treated as a tool limitation, not repository evidence.
-- B-001 remains: no actual Huawei target device in-session. It blocks target validation/M1 evidence, not this completed knowledge mission.
-- `_human/` and all predecessor user repositories remained unread.
+## Arm B current state
+- V10.3-B/FH-A1 completion is historical; mission is reopened by explicit user contract.
+- Mandatory external research Q1..Q12 is complete and reconverged.
+- FH-A2 is selected: incident-first direct attribution → minimum evidence escalation → shadow/paired evaluation → typed actuation only if target-qualified.
+- Evidence-gating/UNKNOWN/NO_OP/typed privilege survive FH-A1; continuous-recorder-first topology does not.
+- Android 17 MemoryLimiter, API 37.2 app memory budgets, start/exit history, freezer/Binder behavior and background quotas materially changed the architecture.
+- MGLRU weakens the value of user-space page-hotness duplication.
+- M0.2 read-only probe/analyzer now exposes Arm B capabilities conservatively; host suite is 8/8.
+- Remaining consequential uncertainty is target-specific.
 
-## Exact next task
-Run M1 E-001/E-002 on the actual target using read-only tools; keep raw device evidence private.
+## Next action
+Full hostile re-audit → revised GitHub cold-start → new validated transfer ZIP → terminal state publication.

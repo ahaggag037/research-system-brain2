@@ -1,20 +1,114 @@
-# REQUIREMENT LEDGER — FINAL COMPACT
+# REQUIREMENT LEDGER — Arm B compact operational view
 
-Full verbose copy is in the transfer ZIP. This canonical working-memory ledger preserves every atomic ID, source family, final status and primary evidence. All 90 atomics were compiled from the staged V10.3-B mission contract.
+Canonical evidence detail: `REQUIREMENT_TRACEABILITY.md`; canonical mission rationale lives in `docs/**`. This scratch ledger is deliberately compact.
 
-| IDs | Source family | Priority | Primary evidence | Status |
-|---|---|---|---|---|
-| R-001..R-011 | Control Plane | MUST/SHOULD/MAY | architecture; checkpoint; sources; final audit | SATISFIED |
-| R-012..R-017 | Single-session contract | MUST | checkpoint; final audit; package manifest | SATISFIED |
-| R-018..R-028 | Clean repository/GitHub boundary | MUST/SHOULD | AGENTS; GitHub history; final audit; handoff | SATISFIED |
-| R-029..R-036 | Engineering Constitution | MUST | safety; evidence; architecture; state; final audit | SATISFIED |
-| R-037..R-040 | Working Memory Protocol | MUST/SHOULD | `.v10/working_memory/`; AGENTS | SATISFIED |
-| R-041..R-044 | Compliance Shell | MUST | this ledger; contradiction register; final audit | SATISFIED |
-| R-045..R-055 | Knowledge/GitHub package contracts | MUST | AGENTS; docs; JSON state/graph/maps | SATISFIED |
-| R-056..R-068 | Implementation completeness | MUST | runbook; code map; contracts; tests; readiness; integration proof | SATISFIED |
-| R-069..R-070 | Handoff/cold start | MUST | HANDOFF_CHECKPOINT; FINAL_AUDIT | SATISFIED |
-| R-071..R-075 | Visual Twin Contract | MUST | editable Mermaid + VISUAL_TRACEABILITY | SATISFIED |
-| R-076..R-086 | Final Audit Protocol | MUST | FINAL_AUDIT + repaired tests/state | SATISFIED |
-| R-087..R-090 | Transfer Package Spec | MUST | exact ZIP; PACKAGE_MANIFEST; SHA256SUMS; handoff | SATISFIED |
+| ID | Source | Priority | Status |
+|---|---|---|---|
+| R-001 | V10 | MUST | SATISFIED |
+| R-002 | V10 | MUST | SATISFIED |
+| R-003 | V10 | MUST | SATISFIED |
+| R-004 | V10 | SHOULD | SATISFIED |
+| R-005 | V10 | MUST | SATISFIED |
+| R-006 | V10 | MUST | SATISFIED |
+| R-007 | V10 | MAY | SATISFIED |
+| R-008 | V10 | MUST | SATISFIED |
+| R-009 | V10 | MUST | SATISFIED |
+| R-010 | V10 | MUST | SATISFIED |
+| R-011 | V10 | MUST | SATISFIED |
+| R-012 | V10 | MUST | SATISFIED |
+| R-013 | V10 | MUST | SATISFIED |
+| R-014 | V10 | MUST | SATISFIED |
+| R-015 | V10 | MUST | SATISFIED |
+| R-016 | V10 | MUST | SATISFIED |
+| R-017 | V10 | MUST | SATISFIED |
+| R-018 | V10 | MUST | SATISFIED |
+| R-019 | V10 | MUST | SATISFIED |
+| R-020 | V10 | MUST | SATISFIED |
+| R-021 | V10 | MUST | SATISFIED |
+| R-022 | V10 | MUST | SATISFIED |
+| R-023 | V10 | MUST | SATISFIED |
+| R-024 | V10 | SHOULD | SATISFIED |
+| R-025 | V10 | MUST | SATISFIED |
+| R-026 | V10 | MUST | SATISFIED |
+| R-027 | V10 | MUST | SATISFIED |
+| R-028 | V10 | MUST | SATISFIED |
+| R-029 | V10 | MUST | SATISFIED |
+| R-030 | V10 | MUST | SATISFIED |
+| R-031 | V10 | MUST | SATISFIED |
+| R-032 | V10 | MUST | SATISFIED |
+| R-033 | V10 | MUST | SATISFIED |
+| R-034 | V10 | MUST | SATISFIED |
+| R-035 | V10 | MUST | SATISFIED |
+| R-036 | V10 | MUST | SATISFIED |
+| R-037 | V10 | MUST | SATISFIED |
+| R-038 | V10 | MUST | SATISFIED |
+| R-039 | V10 | MUST | SATISFIED |
+| R-040 | V10 | SHOULD | SATISFIED |
+| R-041 | V10 | MUST | SATISFIED |
+| R-042 | V10 | MUST | SATISFIED |
+| R-043 | V10 | MUST | SATISFIED |
+| R-044 | V10 | MUST | SATISFIED |
+| R-045 | V10 | MUST | SATISFIED |
+| R-046 | V10 | MUST | SATISFIED |
+| R-047 | V10 | MUST | SATISFIED |
+| R-048 | V10 | MUST | SATISFIED |
+| R-049 | V10 | MUST | SATISFIED |
+| R-050 | V10 | MUST | SATISFIED |
+| R-051 | V10 | MUST | SATISFIED |
+| R-052 | V10 | MUST | SATISFIED |
+| R-053 | V10 | MUST | SATISFIED |
+| R-054 | V10 | MUST | SATISFIED |
+| R-055 | V10 | MUST | SATISFIED |
+| R-056 | V10 | MUST | SATISFIED |
+| R-057 | V10 | MUST | SATISFIED |
+| R-058 | V10 | MUST | SATISFIED |
+| R-059 | V10 | MUST | SATISFIED |
+| R-060 | V10 | MUST | SATISFIED |
+| R-061 | V10 | MUST | SATISFIED |
+| R-062 | V10 | MUST | SATISFIED |
+| R-063 | V10 | MUST | SATISFIED |
+| R-064 | V10 | MUST | SATISFIED |
+| R-065 | V10 | MUST | SATISFIED |
+| R-066 | V10 | MUST | SATISFIED |
+| R-067 | V10 | MUST | SATISFIED |
+| R-068 | V10 | MUST | SATISFIED |
+| R-069 | V10 | MUST | SATISFIED |
+| R-070 | V10 | MUST | SATISFIED |
+| R-071 | V10 | MUST | SATISFIED |
+| R-072 | V10 | MUST | SATISFIED |
+| R-073 | V10 | MUST | SATISFIED |
+| R-074 | V10 | MUST | SATISFIED |
+| R-075 | V10 | MUST | SATISFIED |
+| R-076 | V10 | MUST | SATISFIED |
+| R-077 | V10 | MUST | SATISFIED |
+| R-078 | V10 | MUST | SATISFIED |
+| R-079 | V10 | MUST | SATISFIED |
+| R-080 | V10 | MUST | SATISFIED |
+| R-081 | V10 | MUST | SATISFIED |
+| R-082 | V10 | MUST | SATISFIED |
+| R-083 | V10 | MUST | SATISFIED |
+| R-084 | V10 | MUST | SATISFIED |
+| R-085 | V10 | MUST | SATISFIED |
+| R-086 | V10 | MUST | SATISFIED |
+| R-087 | V10 | MUST | SATISFIED |
+| R-088 | V10 | MUST | SATISFIED |
+| R-089 | V10 | MUST | SATISFIED |
+| R-090 | V10 | MUST | SATISFIED |
+| R-091 | Arm B | MUST | IN_PROGRESS |
+| R-092 | Arm B | MUST | SATISFIED |
+| R-093 | Arm B | MUST | IN_PROGRESS |
+| R-094 | Arm B | MUST | SATISFIED |
+| R-095 | Arm B | MUST | SATISFIED |
+| R-096 | Arm B | MUST | SATISFIED |
+| R-097 | Arm B | MUST | SATISFIED |
+| R-098 | Arm B | MUST | IN_PROGRESS |
+| R-099 | Arm B | MUST | SATISFIED |
+| R-100 | Arm B | MUST | SATISFIED |
+| R-101 | Arm B | MUST | OPEN |
+| R-102 | Arm B | MUST | OPEN |
+| R-103 | Arm B | MUST | OPEN |
+| R-104 | Arm B | MUST | OPEN |
+| R-105 | Arm B | MUST | SATISFIED |
+| R-106 | Arm B | MUST | SATISFIED |
 
-Per-ID final evidence matrix: `REQUIREMENT_TRACEABILITY.md` in the transfer package. Final gate: **90/90 SATISFIED; 0 blocked mission MUSTs.**
+Count: 106. Terminal rule: every MUST is SATISFIED or BLOCKED with explicit recovery before completion.

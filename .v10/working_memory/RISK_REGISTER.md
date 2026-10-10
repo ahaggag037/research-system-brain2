@@ -1,12 +1,12 @@
-# RISK REGISTER
+# RISK REGISTER — FH-A2
 
-All remain ACTIVE until target/implementation evidence closes them. Canonical mitigations: `docs/architecture/PRIVILEGE_AND_SAFETY.md` and `docs/evidence/RISK_TRANSMUTATION.md`.
-
-| ID | Risk | Primary gate |
-|---|---|---|
-| RISK-001 | unsafe privileged actuation | typed gateway + E-005 + rollback |
-| RISK-002 | tweak/benchmark superstition | causal experiments + user-visible outcomes |
-| RISK-003 | telemetry self-interference | two-speed capture + E-002 |
-| RISK-004 | controller conflict/oscillation | shadow/no-op + serialization + hysteresis + verify |
-| RISK-005 | Huawei policy misclassification | vendor-policy state + E-004 + documented settings |
-| RISK-006 | cross-app telemetry leakage | local-first + redacted export + `.gitignore` |
+| ID | Risk | Current control | Residual truth |
+|---|---|---|---|
+| RISK-001 | unsafe privileged actuation | typed gateway, target qualification, one transaction, rollback, forbidden bypasses | no write implemented/admitted |
+| RISK-002 | noncausal attribution | direct evidence hierarchy, version provenance, contradictions, UNKNOWN | target reason fidelity/access unknown |
+| RISK-003 | observer self-interference | tiered capture, Observer Budget, no continuous correctness dependency | target overhead unknown until E-002 |
+| RISK-004 | controller conflict | no second OOM killer; cgroup/DAMON/MGLRU writes research-only | future actuator ownership unknown |
+| RISK-005 | platform/vendor-version misclassification | DeviceProfile + versioned adapters + UNKNOWN fallback | exact Huawei branch unknown |
+| RISK-006 | telemetry privacy | local-first raw evidence, redacted export, no auto repo upload | cross-app evidence can be sensitive locally |
+| RISK-007 | direct-history blind spot | UNOBSERVABLE + tiered escalation | cross-UID access may be weak |
+| RISK-008 | continuity prediction overfit | shadow-only, holdout/calibration/fallback | M4 not run |
