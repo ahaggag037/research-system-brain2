@@ -19,5 +19,5 @@ record_file vmstat /proc/vmstat
 record_file loadavg /proc/loadavg
 if command -v dumpsys >/dev/null 2>&1; then record_cmd thermalservice dumpsys thermalservice; record_cmd meminfo_system dumpsys meminfo system; else : > "$OUT/thermalservice.txt"; printf 'thermalservice\tMISSING\n' >> "$STATUS"; : > "$OUT/meminfo_system.txt"; printf 'meminfo_system\tMISSING\n' >> "$STATUS"; fi
 NOW="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date)"
-{ printf '{"schemaVersion":1,"createdUtc":"%s","files":[' "$NOW"; first=1; while IFS='\t' read -r name status; do [ -n "$name" ] || continue; case "$status" in OK) js="OK";; MISSING*) js="MISSING";; *DENIED*) js="DENIED";; *) js="ERROR";; esac; [ "$first" -eq 1 ] || printf ','; first=0; printf '{"name":"%s","status":"%s","source":"%s.txt"}' "$name" "$js" "$name"; done < "$STATUS"; printf ']}\n'; } > "$OUT/manifest.json"
+{ printf '{"schemaVersion":1,"createdUtc":"%s","files":[' "$NOW"; TAB="$(printf '\t')"; first=1; while IFS="$TAB" read -r name status; do [ -n "$name" ] || continue; case "$status" in OK) js="OK";; MISSING*) js="MISSING";; *DENIED*) js="DENIED";; *) js="ERROR";; esac; [ "$first" -eq 1 ] || printf ','; first=0; printf '{"name":"%s","status":"%s","source":"%s.txt"}' "$name" "$js" "$name"; done < "$STATUS"; printf ']}\n'; } > "$OUT/manifest.json"
 printf 'FixHUA snapshot written to %s\n' "$OUT"
