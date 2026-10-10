@@ -1,13 +1,7 @@
 # SOURCE INDEX
 
-> Independent public sources only. No predecessor/user FixHUA sources are permitted.
+Operational source register distilled into canonical `docs/evidence/SOURCES.md`.
 
-## Source template
-SOURCE_ID:
-TYPE: DEVICE_OBSERVATION | PRIMARY_PLATFORM | VENDOR | SOURCE_CODE | ACADEMIC | TECHNICAL | COMMUNITY | OTHER
-TITLE:
-LOCATION:
-DATE/RECENCY:
-CLAIMS_SUPPORTED:
-LIMITATIONS:
-NOTES:
+- S-001..S-016 are independent public Android/Linux/Huawei sources.
+- No predecessor/user FixHUA repository, cached FixHUA work, `_human/`, or parallel-model output was used as evidence.
+- Device-specific claims remain UNKNOWN until M1 target evidence.

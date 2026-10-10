@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "packageName": "FixHUA-Blind-Genesis-V10.3-Clean-Repo-Knowledge-Package.zip",
+  "packageVersion": "V10.3-Clean-Repo-Knowledge-Package",
+  "architecture": {"id":"FH-A1","name":"Evidence-Gated Adaptive Supervisor","status":"PROPOSED_FULLY_SPECIFIED"},
+  "canonicalRepository": "ahaggag037/research-system-brain2",
+  "canonicalBranch": "main",
+  "transferZip": {"sha256":"28b9511277d7c8ba926ddeda222b0e63cfc8738cd6b6f4b017c6040c65e70c7b","sizeBytes":100708,"fileCount":55,"validation":"unpacked fresh; 6/6 tests PASS; validators PASS; internal SHA256SUMS PASS"},
+  "note": "The exact per-file manifest with purpose/status/canonical flag/size/SHA-256 is embedded inside the transfer ZIP as PACKAGE_MANIFEST.json. This repository copy summarizes the independently validated transport artifact."
+}

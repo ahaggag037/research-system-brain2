@@ -1,0 +1,2 @@
+28b9511277d7c8ba926ddeda222b0e63cfc8738cd6b6f4b017c6040c65e70c7b  FixHUA-Blind-Genesis-V10.3-Clean-Repo-Knowledge-Package.zip
+# Full per-file SHA256SUMS.txt is embedded inside the transfer ZIP and was verified after fresh extraction.
