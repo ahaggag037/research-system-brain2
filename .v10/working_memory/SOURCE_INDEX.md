@@ -1,0 +1,13 @@
+# SOURCE INDEX
+
+> Independent public sources only. No predecessor/user FixHUA sources are permitted.
+
+## Source template
+SOURCE_ID:
+TYPE: DEVICE_OBSERVATION | PRIMARY_PLATFORM | VENDOR | SOURCE_CODE | ACADEMIC | TECHNICAL | COMMUNITY | OTHER
+TITLE:
+LOCATION:
+DATE/RECENCY:
+CLAIMS_SUPPORTED:
+LIMITATIONS:
+NOTES:
